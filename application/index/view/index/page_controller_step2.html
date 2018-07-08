@@ -1,0 +1,95 @@
+{extend name="share:layout"/}
+{block name="title"}控制器 - 步骤2{/block}
+{block name="body"}
+<h3>控制器 - 步骤2</h3>
+
+<br>
+<pre>
+namespace app\index\controller;
+use think\Controller;
+
+class {$Think.get.table|ucfirst} extends Controller
+{
+    public function manager($keyword='')
+    {
+    	${$tb}=model('{$tb}');
+		$list = ${$tb}->getByKeyword($keyword);
+		$this->assign('page', $list->render());
+    	$this->assign('list', $list);
+    	return view();
+    }
+
+    public function getlist($page=1,$pagesize=10,$order='')
+    {
+    	${$tb}=model('{$tb}');
+    	$list = ${$tb}->getByPage('',$order,$pagesize,'',false);
+
+    	$this->assign('list', $list);
+		$this->assign('page', $list->render());
+
+    	return view();
+    }
+
+    public function getTrashedList($page=1,$pagesize=10,$order='')
+    {
+    	${$tb}=model('{$tb}');
+    	$list = ${$tb}->getByPage('',$order,$pagesize,'',true);
+
+    	$this->assign('list', $list);
+		$this->assign('page', $list->render());
+
+    	return view();
+    }
+
+    public function add(){
+
+    	return view('edit');
+    }
+
+    public function edit(${$key|strtolower}){
+
+    	${$tb}=model('{$tb}');
+    	$m = ${$tb}->find(${$key|strtolower});
+    	$this->assign('m', $m);
+    	return view();
+    }
+
+    public function delete(${$key|strtolower},$istrue=false){
+
+    	${$tb}=model('{$tb}');
+    	if(${$tb}->delete(${$key|strtolower},$istrue)){
+    		$this->success('删除成功！','manager');
+    	}else{
+    		$this->error('删除失败！');
+    	}
+    }
+
+    public function save(){
+
+    	$data=input('post.');
+    	${$tb}=model('{$tb}');
+    	if($data['{$key}']==''){
+    		$result = $this->validate($data,'{$tb|ucfirst}.add');
+			if(true !== $result){
+			    $this->error($result);
+			}else{
+				${$tb}->add($data);
+				$this->success('添加成功！','manager');
+			}
+    	}else{
+    		$result = $this->validate($data,'{$tb|ucfirst}.edit');
+			if(true !== $result){
+			    $this->error($result);
+			}else{
+    			${$tb}->update($data, $data['{$key}']);
+    			$this->success('更新成功！','manager');
+    		}
+    	}
+    }
+
+}
+
+
+</pre>
+
+{/block}

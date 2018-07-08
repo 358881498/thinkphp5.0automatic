@@ -1,0 +1,73 @@
+{extend name="share:layout"/}
+{block name="title"}控制器 - 步骤1{/block}
+{block name="body"}
+<h3>控制器 - 步骤1</h3>
+<form action="{:url('page_controller_step2')}" method="get">
+<h4 style="color: red;">
+    <input type="checkbox" name="controller" id="controller"><label for="controller">是否继承公共控制器</label>
+</h4>
+    控制器名字:<input name="controller_name" />
+    <span style="color: red;">未填写，控制器默认为表名</span><br /><br />
+    控制器方法名前缀:<input name="controller_name" />
+    <span style="color: red;">未填写，方法名前缀默认为表名</span><br /><br />
+选择表：
+<select name="table">
+<option value="">选择表</option>
+{volist name="tables" id="vo"}
+    <option value="{$vo.Name}" {eq name="Think.get.table" value="$vo.Name"}selected{/eq}>{$vo.Name} -- {$vo.Comment}</option>
+{/volist}
+</select>
+<br><br>
+    选择模块：
+    <select name="mokuai" id="mokuai">
+        <option value="">选择模块</option>
+        {volist name="mokuai" id="vo"}
+        <option value="{$vo}">{$vo}</option>
+        {/volist}
+    </select>
+    <br><br>
+    选择要调用模型：
+    <select name="validate" id="validate">
+    </select>
+    <br><br>
+    选择要调用验证器：
+    <select name="model" id="model">
+    </select>
+    <br><br>
+    <button type="submit" class="btn btn-w-m btn-primary">生成控制器代码</button>
+    <button type="submit" class="btn btn-w-m btn-primary">生成控制器方法代码</button>
+</form>
+<hr /><hr />
+<a href="{:url('/logincontroller')}">
+    <button type="button" class="btn btn-w-m btn-primary">公共控制器代码</button>
+    <button type="button" class="btn btn-w-m btn-primary">登录控制器代码</button>
+</a>
+<h4>
+    1、公共控制器名字Base<br><br>
+    2、生成控制器代码 -- 生成控制器所有代码 其中带有增删改查4种方法<br><br>
+    3、生成控制器方法代码 -- 只生成控制器方法，增删改查4种方法
+    <br><br>
+    4、公共控制器代码、登录控制器代码 无需填写表单数据，直接点击生成
+</h4>
+<script type="text/javascript">
+    $("#mokuai").change(function(){
+        var data = $("#mokuai").val()
+        $.ajax({
+            type: 'post',
+            url: 'controller_step2',
+            data: {mokuai:data},
+            success: function (data) {
+                console.log(data);
+                var selDom = $("#validate");
+                $.each(data.validate,function(n,value){
+                    selDom.append("<option value="+value+">"+value+"</option>");
+                });
+                var selDom1 = $("#model");
+                $.each(data.validate,function(n,value){
+                    selDom1.append("<option value="+value+">"+value+"</option>");
+                });
+            }
+        });
+    });
+</script>
+{/block}

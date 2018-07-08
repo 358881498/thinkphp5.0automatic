@@ -1,0 +1,30 @@
+{extend name="share:layout"/}
+{block name="title"}验证器 - 步骤3 - 完成{/block}
+{block name="body"}
+<h3>验证器- 步骤3 - 完成</h3>
+<br>
+<textarea readonly style="width: 100%; height: 750px; font-family: &quot;Courier New&quot;; font-size: 12px; line-height: 1.5;">
+namespace app\index\validate;
+
+use think\Validate;
+
+class {$table|ucfirst} extends Validate
+{
+    protected $rule = [
+    {foreach name="rs" id="r" key="k"}
+        '{$k}' => '{:implode('|',$r)}',
+    {/foreach}
+    ];
+
+    protected $message = [
+    {foreach name="ms" id="m" key="k"}
+        '{$k}' => '{$m}',
+    {/foreach}
+    ];
+    protected $scene = [
+        'add'   =>  [{$fields}],
+        'edit'  =>  [{$fields}],
+    ];
+}
+</textarea>
+{/block}
