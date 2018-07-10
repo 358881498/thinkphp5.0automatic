@@ -31,7 +31,7 @@ class Login extends Controller
         }
         $postdata = input('param.');
         //验证器
-        $result = $this->validate($postdata, 'Login');
+        $result = $this->validate($postdata, 'Login.find');
         if (true !== $result) {
             return res(10001, '', $result);
         };
