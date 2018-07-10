@@ -1,0 +1,33 @@
+{extend name="share:layout"/}
+{block name="title"}公共控制器{/block}
+{block name="body"}
+<h3>公共控制器</h3>
+<br>
+<textarea readonly style="width: 100%; height: 750px; font-family: &quot;Courier New&quot;; font-size: 12px; line-height: 1.5;">
+namespace app\{$mokuai}\controller;
+use think\Controller;
+
+//公共控制器
+//需要登录的控制器都继承Base公共控制器
+class Base extends Controller
+{
+    //定义前置方法名
+    protected $beforeActionList = [
+        'log_in',
+    ];
+    //空方法
+    public function _empty($name)
+    {
+        return $this->error("空方法");//可跳转到404
+    }
+    //前置方法
+    public function log_in()
+    {
+        //判断是否登录
+        if(session("?admin_user") == false){
+            return $this->redirect("/adminlogin");
+       }
+    }
+}
+</textarea>
+{/block}

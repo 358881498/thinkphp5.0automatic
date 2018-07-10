@@ -1,0 +1,18 @@
+{extend name="share:layout"/}
+{block name="title"}空控制器{/block}
+{block name="body"}
+<h3>空控制器</h3>
+<br>
+<textarea readonly style="width: 100%; height: 750px; font-family: &quot;Courier New&quot;; font-size: 12px; line-height: 1.5;">
+namespace app\{$mokuai}\controller;
+use think\Controller;
+//空控制器
+class Error extends Controller
+{
+    public function index()
+    {
+        return $this->error("空控制器");//可跳转到404
+    }
+}
+</textarea>
+{/block}

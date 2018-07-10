@@ -37,6 +37,8 @@ class Index extends Base
             $cls = $this->columns($table);
             $this->assign('cls',$cls);
         }
+        $mokuai = $this->mokuai();
+        $this->assign('mokuai',$mokuai);
         return view();
     }
     //生成验证代码
@@ -212,24 +214,25 @@ class Index extends Base
         }else{
             $this->assign('table',$vals['validata_name']);
         }
+        if(input('mokuai')){
+            $mokuai = input('mokuai');
+        }else{
+            $mokuai = 'index';
+        }
         $this->assign('rs',$rs);
         $this->assign('ms',$ms);
         $this->assign('fields',$fields);
+        $this->assign('mokuai',$mokuai);
+        return view();
+    }
+    //配置文件
+    public function extra(){
         return view();
     }
     //控制器
     public function page_controller_step1(){
-        $dir = dirname(dirname(dirname(__FILE__)));
-        $files = array();
-        if(is_dir($dir)){
-            $child_dirs = scandir($dir);
-            foreach($child_dirs as $child_dir){
-                if($child_dir != '.' && $child_dir != '..' && $child_dir != "extra" && !strstr($child_dir, '.')){
-                    $files[] = $child_dir;
-                }
-            }
-        }
-        $this->assign('mokuai',$files);
+        $mokuai = $this->mokuai();
+        $this->assign('mokuai',$mokuai);
         $tbs = $this->tables();
         $this->assign('tables',$tbs);
         return view();
@@ -275,6 +278,52 @@ class Index extends Base
         }
         return json($files);
     }
+
+    //公共控制器
+    public function basecontroller(){
+        if(input('mokuai')){
+            $mokuai = input('mokuai');
+        }else{
+            $mokuai = 'index';
+        }
+        $this->assign('mokuai',$mokuai);
+        return view();
+    }
+    //登录控制器
+    public function logincontroller(){
+        if(input('mokuai')){
+            $mokuai = input('mokuai');
+        }else{
+            $mokuai = 'index';
+        }
+        $this->assign('mokuai',$mokuai);
+        return view();
+    }
+    //空控制器
+    public function errorontroller(){
+        if(input('mokuai')){
+            $mokuai = input('mokuai');
+        }else{
+            $mokuai = 'index';
+        }
+        $this->assign('mokuai',$mokuai);
+        return view();
+    }
+    //获取模块
+    public function mokuai(){
+        $dir = dirname(dirname(dirname(__FILE__)));
+        $files = array();
+        if(is_dir($dir)){
+            $child_dirs = scandir($dir);
+            foreach($child_dirs as $child_dir){
+                if($child_dir != '.' && $child_dir != '..' && $child_dir != "extra" && !strstr($child_dir, '.')){
+                    $files[] = $child_dir;
+                }
+            }
+        }
+        return $files;
+    }
+
     public function page_model_step1(){
         $tables = $this->tables();
         $this->assign('tables',$tables);

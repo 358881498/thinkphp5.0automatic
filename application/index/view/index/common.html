@@ -13,27 +13,28 @@ function dd($data){
     print_r($data);
 }
 //请求返回json
-function res($status = 0, $data = '',$msg = ''){
+function res($code = 0, $data = '',$message = ''){
+    //调用extra/code配置文件中定义好的常量
     $res = [
-        'status' => config("admin.".$status)['code'],
-        'msg' => config("admin.".$status)['message'],
+        'code' => config("code.".$code)['code'],
+        'message' => config("code.".$code)['message'],
         'data' => $data,
     ];
-    if(!empty($msg)){
-        $res['msg'] = $msg;
+    if(!empty($message)){
+        $res['message'] = $message;
     }
     return json($res);
 }
 //请求返回
-function returnstr($status = 0, $msg = ''){
-    $data = config("admin.".$status)['message'];
-    if(!empty($msg)){
-        $data = $msg;
+function returnstr($code = 0, $message = ''){
+    $res = config("code.".$code)['message'];
+    if(!empty($message)){
+        $res = $message;
     }
-    return $data;
+    return $res;
 }
 //递归
-function recursive_menu($list, $parent_id=0){
+function recursive($list, $parent_id=0){
     $arr = array();
     foreach($list as $l){
         if($l['parent_id'] == $parent_id){
@@ -55,15 +56,29 @@ function delete_data($where, $table){
     $res = db($table)->delete($where);
     return $res;
 }
-//审核、更新某一个字段
-function audit($table, $where, $setField){
+//更新某一个字段
+function update_data($table, $where, $setField){
     $data = db($table)
         ->where($where)
         ->setField($setField);
     return $data;
 }
-//统计
-function tablecount($table, $where){
+//查询表里一条数据
+function find_data($table, $where){
+    $data = db($table)
+        ->where($where)
+        ->find();
+    return $data;
+}
+//查询表里全部数据
+function select_data($table, $where){
+    $data = db($table)
+        ->where($where)
+        ->select();
+    return $data;
+}
+//统计数据
+function count_data($table, $where){
     $data = db($table)
         ->where($where)
         ->count();

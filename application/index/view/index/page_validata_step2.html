@@ -11,6 +11,14 @@
 <form action="{:url('page_validata_step3')}" method="post">
 <input type="hidden" name="table" value="{$Think.get.table}">
 <input type="hidden" name="validata_name" value="{$validata_name}">
+选择模块：
+<select name="mokuai">
+	<option value="">选择模块</option>
+	{volist name="mokuai" id="vo"}
+	<option value="{$vo}">{$vo}</option>
+	{/volist}
+</select>
+<span style="color: red;">未选择，验证器命名默认为index</span><br /><br />
 <ul class="a">
 {volist name="cls" id="vo"}
 	{neq name="$vo.Key" value="PRI"}

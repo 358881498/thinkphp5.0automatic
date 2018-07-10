@@ -27,27 +27,62 @@
     </select>
     <br><br>
     选择要调用模型：
-    <select name="validate" id="validate">
+    <select name="model">
+    </select>
+    <br><br>
+    选择要调用模型放马：
+    <select name="modelfunction">
     </select>
     <br><br>
     选择要调用验证器：
-    <select name="model" id="model">
+    <select name="validate">
     </select>
     <br><br>
     <button type="submit" class="btn btn-w-m btn-primary">生成控制器代码</button>
     <button type="submit" class="btn btn-w-m btn-primary">生成控制器方法代码</button>
 </form>
-<hr /><hr />
-<a href="{:url('/logincontroller')}">
-    <button type="button" class="btn btn-w-m btn-primary">公共控制器代码</button>
-    <button type="button" class="btn btn-w-m btn-primary">登录控制器代码</button>
-</a>
+<hr />
+<form action="{:url('basecontroller')}" method="get">
+    选择模块：
+    <select name="mokuai">
+        <option value="">选择模块</option>
+        {volist name="mokuai" id="vo"}
+        <option value="{$vo}">{$vo}</option>
+        {/volist}
+    </select>
+    <span style="color: red;">未填写，控制器默命名认为index</span><br /><br />
+    <button type="submit" class="btn btn-w-m btn-primary">公共控制器代码</button>
+</form>
+<hr />
+<form action="{:url('logincontroller')}" method="get">
+    选择模块：
+    <select name="mokuai">
+        <option value="">选择模块</option>
+        {volist name="mokuai" id="vo"}
+        <option value="{$vo}">{$vo}</option>
+        {/volist}
+    </select>
+    <span style="color: red;">未填写，控制器命名默认为index</span><br /><br />
+    <button type="submit" class="btn btn-w-m btn-primary">登录控制器代码</button>
+</form>
+<hr />
+<form action="{:url('errorontroller')}" method="get">
+    选择模块：
+    <select name="mokuai">
+        <option value="">选择模块</option>
+        {volist name="mokuai" id="vo"}
+        <option value="{$vo}">{$vo}</option>
+        {/volist}
+    </select>
+    <span style="color: red;">未填写，控制器命名默认为index</span><br /><br />
+    <button type="submit" class="btn btn-w-m btn-primary">空控制器代码</button>
+</form>
 <h4>
     1、公共控制器名字Base<br><br>
+    2、登录控制器代码，调用Login验证器和公共方法 return 返回码<br><br>
+
     2、生成控制器代码 -- 生成控制器所有代码 其中带有增删改查4种方法<br><br>
-    3、生成控制器方法代码 -- 只生成控制器方法，增删改查4种方法
-    <br><br>
-    4、公共控制器代码、登录控制器代码 无需填写表单数据，直接点击生成
+    3、生成控制器方法代码 -- 只生成控制器方法，增删改查4种方法<br><br>
 </h4>
 <script type="text/javascript">
     $("#mokuai").change(function(){
