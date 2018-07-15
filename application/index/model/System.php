@@ -2,7 +2,7 @@
 /*
  * 系统设置模型
  * */
-namespace app\business\model;
+namespace app\index\model;
 use think\Model;
 use think\Db;
 use think\Paginator;

@@ -5,91 +5,133 @@
 
 <br>
 <pre>
-namespace app\index\controller;
+namespace app\{$data.mokuai|default='index'}\controller;
 use think\Controller;
 
-class {$Think.get.table|ucfirst} extends Controller
+class {$data.controller_name|default=$data.table|ucfirst} extends {$data.controller|default='Controller'}
 {
-    public function manager($keyword='')
+    //{$data.table}列表
+    public function {$data.function_name|default=$data.table}list()
     {
-    	${$tb}=model('{$tb}');
-		$list = ${$tb}->getByKeyword($keyword);
-		$this->assign('page', $list->render());
-    	$this->assign('list', $list);
-    	return view();
+	{notempty name="data.findfunction"}
+	//查询条件
+	$where = input('param.');
+	$model = model('{$data.model}');
+	$list = $model->{$data.findfunction}($where);
+	$this->assign('page', $list->render());
+	$this->assign('list', $list);
+	{/notempty}
+return view();
     }
-
-    public function getlist($page=1,$pagesize=10,$order='')
-    {
-    	${$tb}=model('{$tb}');
-    	$list = ${$tb}->getByPage('',$order,$pagesize,'',false);
-
-    	$this->assign('list', $list);
-		$this->assign('page', $list->render());
-
-    	return view();
-    }
-
-    public function getTrashedList($page=1,$pagesize=10,$order='')
-    {
-    	${$tb}=model('{$tb}');
-    	$list = ${$tb}->getByPage('',$order,$pagesize,'',true);
-
-    	$this->assign('list', $list);
-		$this->assign('page', $list->render());
-
-    	return view();
-    }
-
-    public function add(){
+    //add -- {$data.table}表
+    public function {$data.function_name|default=$data.table}add(){
 
     	return view('edit');
     }
-
-    public function edit(${$key|strtolower}){
-
-    	${$tb}=model('{$tb}');
-    	$m = ${$tb}->find(${$key|strtolower});
-    	$this->assign('m', $m);
-    	return view();
+    //exit -- {$data.table}表
+    public function {$data.function_name|default=$data.table}edit(){
+	//条件
+	$where = input('param.');
+	$table = '{$data.table}';
+	//调用公共方法
+	$data = find_data($table,$where);
+	$this->assign('data', $data);
+	return view();
     }
-
-    public function delete(${$key|strtolower},$istrue=false){
-
-    	${$tb}=model('{$tb}');
-    	if(${$tb}->delete(${$key|strtolower},$istrue)){
-    		$this->success('删除成功！','manager');
-    	}else{
-    		$this->error('删除失败！');
-    	}
+	//集合add/exit -- {$data.table}表
+    public function {$data.function_name|default=$data.table}save()
+    {
+	//条件
+	$where = input('param.');
+	if(empty($where['id'])){
+	   //add
+	   return view();
+	}
+	$table = '{$data.table}';
+	//调用公共方法
+	$data = find_data($table,$where);
+	$this->assign('data', $data);
+	return view();
     }
-
-    public function save(){
-
-    	$data=input('post.');
-    	${$tb}=model('{$tb}');
-    	if($data['{$key}']==''){
-    		$result = $this->validate($data,'{$tb|ucfirst}.add');
-			if(true !== $result){
-			    $this->error($result);
-			}else{
-				${$tb}->add($data);
-				$this->success('添加成功！','manager');
-			}
-    	}else{
-    		$result = $this->validate($data,'{$tb|ucfirst}.edit');
-			if(true !== $result){
-			    $this->error($result);
-			}else{
-    			${$tb}->update($data, $data['{$key}']);
-    			$this->success('更新成功！','manager');
-    		}
-    	}
+	//del -- {$data.table}表
+    public function {$data.function_name|default=$data.table}del()
+    {
+	//条件
+	$where = input('param.');
+	$table = '{$data.table}';
+	//调用公共方法
+	$data = delete_data($table,$where);
+	if($data){
+	    $this->success('删除成功！','manager');
+	}else{
+	    $this->error('删除失败！');
+	}
     }
+	//add/exit数据 -- {$data.table}表
+    public function save{$data.function_name|default=$data.table}()
+    {
+	$data = input('param.');
+{notempty name="data.findfunction"}
+	$model = model('{$data.model}');
+	if(empty($data['id'])){
+	    //add
+{notempty name="data.validate"}
+	    $result = $this->validate($data,'{$data.validate}.add');
+	    if(true !== $result){
+		$this->error(returnstr('10001',$result);
+	    }else{
+		$model->{$data.addfunction}()($data);
+		$this->success(returnstr('200'),'{$data.function_name|default=$data.table}list');
+	    }
+{/notempty}
+	}else{
+	    //exit
+{notempty name="data.validate"}
+	    $result = $this->validate($data,'{$data.validate}.exit');
+	    if(true !== $result){
+		$this->error(returnstr('10001',$result);
+	    }
+	    $res = $model->{$data.addfunction}()($data);
+	    if($res){
+		$this->success(returnstr('200'),'{$data.function_name|default=$data.table}list');
+	    }else{
+		$this->error(returnstr('404'));
+	    }
+	}
+{else/}
+	    $res = $model->{$data.addfunction}()($data);
+	    if($res){
+		$this->success(returnstr('200'),'{$data.function_name|default=$data.table}list');
+	    }else{
+		$this->error(returnstr('404'));
+	}
+{/notempty}
+    }
+{else/}
+	if(empty($data['id'])){
+	    //add
+	{notempty name="data.validate"}
+	    $result = $this->validate($data,'{$data.validate}.add');
+	    if(true !== $result){
+	        $this->error(returnstr('10001',$result);
+	    }else{
 
+	    }
+	{/notempty}
+}else{
+	    //exit
+{notempty name="data.validate"}
+	    $result = $this->validate($data,'{$data.validate}.exit');
+	    if(true !== $result){
+		$this->error(returnstr('10001',$result);
+	    }
+	}
+{else/}
+	}
+{/notempty}
+    }
+{/notempty}
 }
-
-
 </pre>
 
 {/block}

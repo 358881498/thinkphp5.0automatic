@@ -4,11 +4,11 @@
 <h3>控制器 - 步骤1</h3>
 <form action="{:url('page_controller_step2')}" method="get">
 <h4 style="color: red;">
-    <input type="checkbox" name="controller" id="controller"><label for="controller">是否继承公共控制器</label>
+    <input type="checkbox" name="controller" value="Base" id="controller"><label for="controller">是否继承公共控制器</label>
 </h4>
     控制器名字:<input name="controller_name" />
     <span style="color: red;">未填写，控制器默认为表名</span><br /><br />
-    控制器方法名前缀:<input name="controller_name" />
+    控制器方法名前缀:<input name="function_name" />
     <span style="color: red;">未填写，方法名前缀默认为表名</span><br /><br />
 选择表：
 <select name="table">
@@ -27,19 +27,19 @@
     </select>
     <br><br>
     选择要调用模型：
-    <select name="model">
+    <select name="model" id="model">
     </select>
     <br><br>
     选择查询时要调用的模型方法：
-    <select name="findfunction">
+    <select name="findfunction" id="findfunction">
     </select>
     <br><br>
     选择add、edit时要调用的模型方法：
-    <select name="addfunction">
+    <select name="addfunction" id="addfunction">
     </select>
     <br><br>
     选择add、edit时要调用的验证器：
-    <select name="validate">
+    <select name="validate" id="validate">
     </select>
     <br><br>
     <button type="submit" class="btn btn-w-m btn-primary">生成控制器代码</button>
@@ -89,6 +89,30 @@
     3、生成控制器方法代码 -- 只生成控制器方法，增删改查4种方法<br><br>
 </h4>
 <script type="text/javascript">
+    $("#model").change(function(){
+        var data = $("#model").val()
+        var data1 = $("#mokuai").val()
+        $.ajax({
+            type: 'post',
+            url: 'getmodelfunction',
+            data: {model:data,mokuai:data1},
+            success: function (data) {
+                console.log(data);
+                var selDom = $("#addfunction");
+                selDom.empty();
+                selDom.append("<option>请选择</option>");
+                $.each(data,function(n,value){
+                    selDom.append("<option value="+value+">"+value+"</option>");
+                });
+                var selDom1 = $("#findfunction");
+                selDom1.empty();
+                selDom1.append("<option>请选择</option>");
+                $.each(data,function(n,value){
+                    selDom1.append("<option value="+value+">"+value+"</option>");
+                });
+            }
+        });
+    });
     $("#mokuai").change(function(){
         var data = $("#mokuai").val()
         $.ajax({
@@ -98,11 +122,15 @@
             success: function (data) {
                 console.log(data);
                 var selDom = $("#validate");
+                selDom.empty();
+                selDom.append("<option>请选择</option>");
                 $.each(data.validate,function(n,value){
                     selDom.append("<option value="+value+">"+value+"</option>");
                 });
                 var selDom1 = $("#model");
-                $.each(data.validate,function(n,value){
+                selDom1.empty();
+                selDom1.append("<option>请选择</option>");
+                $.each(data.model,function(n,value){
                     selDom1.append("<option value="+value+">"+value+"</option>");
                 });
             }

@@ -4,7 +4,7 @@
  * 查询后台用户
  */
 
-namespace app\business\model;
+namespace app\index\model;
 use think\Model;
 
 

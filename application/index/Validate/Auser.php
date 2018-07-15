@@ -2,7 +2,7 @@
 /**
  * 登录验证
  */
-namespace app\business\validate;
+namespace app\index\validate;
 use think\Validate;
 
 class Auser extends Validate

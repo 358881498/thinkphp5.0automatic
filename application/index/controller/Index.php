@@ -237,28 +237,26 @@ class Index extends Base
         $this->assign('tables',$tbs);
         return view();
     }
-    public function page_controller_step2($table){
-        $key ='';
-        $wheresql = '';
-        if($table!=''){
-            $cls = $this->columns($table);//print_r($cls);exit;
-            foreach ($cls as $c){
-                if($c['Key']=='PRI')
-                    $key = $c['Field'];
-                if(strstr($c['Type'],'varchar')!=''){
-                    $wheresql.=" and ".$c['Field']." like binary '%\$keyword%' ";
-                }
-            }
-
-        }
-        $this->assign('wheresql',$wheresql);
-        $this->assign('tb',$table);
-        $this->assign('key',$key);
-        return view();
+    //获取模型方法
+    public function getmodelfunction(){
+        $data = input('param.');
+        $obj = $this->getActions($data['model'],$data['mokuai']);
+        return json($obj);
+    }
+    //模型方法
+    public function getActions($className) {
+        $methods = get_class_methods(model($className));
+        $baseMethods = get_class_methods(model('base'));
+        $res = array_diff($methods, $baseMethods);
+        return $res;
     }
     public function controller_step2(){
-        $dir = dirname(dirname(__FILE__))."\\validate";
-        $dir1 = dirname(dirname(__FILE__))."\\model";
+        $mokuai = input('mokuai');
+        if(empty($mokuai)){
+            return false;
+        }
+        $dir = dirname(dirname(dirname(__FILE__))).'\\'.$mokuai."\\validate";
+        $dir1 = dirname(dirname(dirname(__FILE__))).'\\'.$mokuai."\\model";
         $files = array();
         if(is_dir($dir)){
             $child_dirs = scandir($dir);
@@ -278,35 +276,28 @@ class Index extends Base
         }
         return json($files);
     }
+    //生成控制器代码
+    public function page_controller_step2($table){
+        $data = input('param.');
+//        unset($data['controller_name']);
+        print_r($data);
+        $this->assign('data',$data);
+        $key ='';
+        $wheresql = '';
+        if($table!=''){
+            $cls = $this->columns($table);//print_r($cls);exit;
+            foreach ($cls as $c){
+                if($c['Key']=='PRI')
+                    $key = $c['Field'];
+                if(strstr($c['Type'],'varchar')!=''){
+                    $wheresql.=" and ".$c['Field']." like binary '%\$keyword%' ";
+                }
+            }
 
-    //公共控制器
-    public function basecontroller(){
-        if(input('mokuai')){
-            $mokuai = input('mokuai');
-        }else{
-            $mokuai = 'index';
         }
-        $this->assign('mokuai',$mokuai);
-        return view();
-    }
-    //登录控制器
-    public function logincontroller(){
-        if(input('mokuai')){
-            $mokuai = input('mokuai');
-        }else{
-            $mokuai = 'index';
-        }
-        $this->assign('mokuai',$mokuai);
-        return view();
-    }
-    //空控制器
-    public function errorontroller(){
-        if(input('mokuai')){
-            $mokuai = input('mokuai');
-        }else{
-            $mokuai = 'index';
-        }
-        $this->assign('mokuai',$mokuai);
+        $this->assign('wheresql',$wheresql);
+        $this->assign('tb',$table);
+        $this->assign('key',$key);
         return view();
     }
     //获取模块
@@ -323,7 +314,6 @@ class Index extends Base
         }
         return $files;
     }
-
     public function page_model_step1(){
         $tables = $this->tables();
         $this->assign('tables',$tables);
@@ -490,5 +480,36 @@ class Index extends Base
             $data = $name .$value;
         }
         return $data;
+    }
+
+    //公共控制器
+    public function basecontroller(){
+        if(input('mokuai')){
+            $mokuai = input('mokuai');
+        }else{
+            $mokuai = 'index';
+        }
+        $this->assign('mokuai',$mokuai);
+        return view();
+    }
+    //登录控制器
+    public function logincontroller(){
+        if(input('mokuai')){
+            $mokuai = input('mokuai');
+        }else{
+            $mokuai = 'index';
+        }
+        $this->assign('mokuai',$mokuai);
+        return view();
+    }
+    //空控制器
+    public function errorontroller(){
+        if(input('mokuai')){
+            $mokuai = input('mokuai');
+        }else{
+            $mokuai = 'index';
+        }
+        $this->assign('mokuai',$mokuai);
+        return view();
     }
 }
