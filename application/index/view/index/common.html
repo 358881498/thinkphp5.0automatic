@@ -30,8 +30,9 @@ function res($code = 0, $data = '',$message = ''){
     }
     return json($res);
 }
-//请求返回
+//请求返回string
 function returnstr($code = 0, $message = ''){
+    //调用extra/code配置文件中定义好的常量
     $res = config("code.".$code)['message'];
     if(!empty($message)){
         $res = $message;
@@ -51,43 +52,6 @@ function recursive($list, $parent_id=0){
         }
     }
     return $arr;
-}
-//删除数据
-function delete_data($table, $where){
-    if(is_array($where)){
-        $res = db($table)->where($where)->delete();
-        return $res;
-    }
-    $res = db($table)->delete($where);
-    return $res;
-}
-//更新某一个字段
-function update_data($table, $where, $setField){
-    $data = db($table)
-        ->where($where)
-        ->setField($setField);
-    return $data;
-}
-//查询表里一条数据
-function find_data($table, $where){
-    $data = db($table)
-        ->where($where)
-        ->find();
-    return $data;
-}
-//查询表里全部数据
-function select_data($table, $where){
-    $data = db($table)
-        ->where($where)
-        ->select();
-    return $data;
-}
-//统计数据
-function count_data($table, $where){
-    $data = db($table)
-        ->where($where)
-        ->count();
-    return $data;
 }
 </textarea>
 {/block}

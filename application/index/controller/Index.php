@@ -314,10 +314,25 @@ class Index extends Base
         }
         return $files;
     }
+    /*
+     * 生成模型代码
+     * */
+    //模型页面
     public function page_model_step1(){
-        $tables = $this->tables();
-        $this->assign('tables',$tables);
-        return view();
+        $this->assign('type',input('id'));
+        $this->assign('mokuai',$this->mokuai());
+        if(input('id') == 2){
+            //代码
+            $tables = $this->tables();
+            $this->assign('tables',$tables);
+            return view();
+        }else{
+            //文件
+            $tables = $this->tables();
+            $this->assign('tables',$tables);
+            return view();
+        }
+
     }
     public function page_model_step2($table,$autotimpspan='',$softdelete='',$autotimeCreateFiled='',$autotimeUpdateFiled='',$softdeletefiled=''){
         if($table==''){
@@ -328,14 +343,13 @@ class Index extends Base
             $cls = $this->columns($table);
             $istimestartfiled = false;
             $istimeendfiled = false;
-            $istimefiled = false;
             $issoftdelete = false;
             $msg = '';
             $timeCreateFieldType = '';
             $timeUpdateFieldType = '';
             $softDeleteFielType = '';
             foreach ($cls as $c){
-                if(($c['Field']=='create_time'&&!$istimestartfiled)||($c['Field']==$autotimeCreateFiled&&!$istimestartfiled)){
+                if(($c['Field'] == 'create_time' && !$istimestartfiled)||( $c['Field'] == $autotimeCreateFiled && !$istimestartfiled)){
                     $istimestartfiled= true;
                     $timeCreateFieldType = $c['Type'];
                 }
@@ -350,17 +364,14 @@ class Index extends Base
             }
             if($autotimpspan=='on'){
                 if($istimestartfiled&&$istimeendfiled){
-                    
-                    if(($autotimeCreateFiled==$autotimeUpdateFiled)){
+                    if(($autotimeCreateFiled == $autotimeUpdateFiled)){
                         $this->error('创建时间/修改时间    字段不能相同');
                         return;
                     }
-                    
-                    if(!((startWith($timeCreateFieldType,'int')&&startWith($timeUpdateFieldType,'int'))||(startWith($timeCreateFieldType,'datetime')&&startWith($timeUpdateFieldType,'datetime'))||(startWith($timeCreateFieldType,'timestamp')&&startWith($timeUpdateFieldType,'timestamp')))){
+                    if(!(($timeCreateFieldType == 'int' && $timeUpdateFieldType =='int') || ($timeCreateFieldType == 'datetime' && $timeUpdateFieldType == 'datetime') || ($timeCreateFieldType == 'timestamp' && $timeUpdateFieldType == 'timestamp'))){
                         $this->error('创建时间/更新时间字段必须为int、datetime、timestamp类型，且必须一致！');
                         exit;
                     }
-                    
                     $istimefiled=true;
                     $this->assign('autotime',$istimefiled);
                     $this->assign('timeCreateFieldType',$timeCreateFieldType);
@@ -369,12 +380,10 @@ class Index extends Base
             }
             if($softdelete=='on'){
                 if($issoftdelete){
-                    
-                    if($autotimpspan=='on'&&(($autotimeCreateFiled==$softdeletefiled)||($autotimeUpdateFiled==$softdeletefiled))){
+                    if($autotimpspan == 'on' && (($autotimeCreateFiled == $softdeletefiled) || ($autotimeUpdateFiled == $softdeletefiled))){
                         $this->error('创建时间/修改时间/删除时间    字段不能相同');
                         return;
                     }
-                    
                     $this->assign('softdelete',$softdelete);
                     $this->assign('delfield',empty($softdeletefiled)?'delete_time':$softdeletefiled);
                     $this->assign('softDeleteFielType',$softDeleteFielType);
