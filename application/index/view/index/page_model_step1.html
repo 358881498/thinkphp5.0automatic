@@ -2,9 +2,19 @@
 {block name="title"}模型 - 步骤1{/block}
 
 {block name="body"}
-<h3>模型代码生成 - 步骤1</h3>
 {eq name='type' value='1'}
+<h3>模型代码生成 - 步骤1</h3>
+<h4>
+    1、选择模块，用于空间命名 -- 未选择默认为index模块<br><br>
+    2、模型分层，区分模型层和命名空间<br><br>
+    3、选择表，生成对应表的模型代码<br><br>
+    4、当表里存在字段为create_time、update_time的时，模型会开启自动写入时间<br><br>
+    5、当表里存在备注为软删除的字段时，模型会开启软删除<br><br>
+</h4>
 <form action="{:url('page_model_step2')}" method="get">
+    <h4 style="color: red;">
+        <input type="checkbox" name="model" value="Base"><label for="controller">是否继承公共模型</label>
+    </h4>
     选择模块：
     <select name="mokuai">
         <option value="">选择模块</option>
@@ -14,9 +24,9 @@
     </select>
     <br><br>
     选择分层：
-    <label>数据层<input type="radio" name="modelLayer" value="woman" checked="checked"/></label>
-    <label>逻辑层<input type="radio" name="modelLayer" value="woman"/></label>
-    <label>服务层<input type="radio" name="modelLayer" value="woman"/></label>
+    <label><input type="radio" name="modelLayer" value="model" checked="checked"/>数据层</label>
+    <label><input type="radio" name="modelLayer" value="logic"/>逻辑层</label>
+    <label><input type="radio" name="modelLayer" value="service"/>服务层</label>
     <br><br>
     选择表：
     <select name="table">
@@ -29,6 +39,35 @@
     <button type="submit" class="btn btn-w-m btn-primary">模型代码生成</button>
 </form>
 {else/}
-sasa
+<h3>模型文件生成 - 步骤1</h3>
+<h4>
+    1、选择模块，用于空间命名<br><br>
+    2、模型分层，区分模型层和命名空间<br><br>
+    3、不选择表，则生成所有表对应的模型文件，选择后生成对应表的一个模型文件
+</h4>
+<form action="{:url('model3')}" method="get">
+选择模块：
+<select name="mokuai">
+    <option value="">选择模块</option>
+    {volist name="mokuai" id="vo"}
+    <option value="{$vo}">{$vo}</option>
+    {/volist}
+</select>
+<br><br>
+选择分层：
+<label><input type="radio" name="modelLayer" value="model" checked="checked"/>数据层</label>
+<label><input type="radio" name="modelLayer" value="logic"/>逻辑层</label>
+<label><input type="radio" name="modelLayer" value="service"/>服务层</label>
+<br><br>
+选择表：
+<select name="table">
+    <option value="">选择表</option>
+    {volist name="tables" id="vo"}
+    <option value="{$vo.Name}">{$vo.Name} -- {$vo.Comment}</option>
+    {/volist}
+</select>
+<br><br>
+<button type="submit" class="btn btn-w-m btn-primary">模型文件生成</button>
+</form>
 {/eq}
 {/block}

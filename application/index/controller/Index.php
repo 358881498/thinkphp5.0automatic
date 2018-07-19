@@ -1,6 +1,7 @@
 <?php
 namespace app\index\controller;
 use app\index\Build;
+use think\Loader;
 class Index extends Base
 {
     //生成文件
@@ -321,95 +322,67 @@ class Index extends Base
     public function page_model_step1(){
         $this->assign('type',input('id'));
         $this->assign('mokuai',$this->mokuai());
-        if(input('id') == 2){
-            //代码
-            $tables = $this->tables();
-            $this->assign('tables',$tables);
-            return view();
-        }else{
-            //文件
-            $tables = $this->tables();
-            $this->assign('tables',$tables);
-            return view();
-        }
-
+        //代码
+        $tables = $this->tables();
+        $this->assign('tables',$tables);
+        return view();
     }
-    public function page_model_step2($table,$autotimpspan='',$softdelete='',$autotimeCreateFiled='',$autotimeUpdateFiled='',$softdeletefiled=''){
-        if($table==''){
+    //数据表名转换成符合模型命名规格的字符串
+    public function parseName($name, $type = 0, $ucfirst = true){
+        if ($type) {
+            $name = preg_replace_callback('/_([a-zA-Z])/', function ($match) {
+                return strtoupper($match[1]);
+            }, $name);
+            return $ucfirst ? ucfirst($name) : lcfirst($name);
+        }
+        return strtolower(trim(preg_replace("/[A-Z]/", "_\\0", $name), "_"));
+    }
+    //生成模型代码
+    public function page_model_step2(){
+        $data = input('param.');
+        if(empty($data['table'])){
             $this->error('缺少表');
             return;
         }
-        if($table!=''){
-            $cls = $this->columns($table);
-            $istimestartfiled = false;
-            $istimeendfiled = false;
-            $issoftdelete = false;
-            $msg = '';
-            $timeCreateFieldType = '';
-            $timeUpdateFieldType = '';
-            $softDeleteFielType = '';
-            foreach ($cls as $c){
-                if(($c['Field'] == 'create_time' && !$istimestartfiled)||( $c['Field'] == $autotimeCreateFiled && !$istimestartfiled)){
-                    $istimestartfiled= true;
-                    $timeCreateFieldType = $c['Type'];
-                }
-                if(($c['Field']=='update_time'&&!$istimeendfiled)||($c['Field']==$autotimeUpdateFiled&&!$istimeendfiled)){
-                    $istimeendfiled= true;
-                    $timeUpdateFieldType = $c['Type'];
-                }
-                if(($c['Field']=='delete_time'&&!$issoftdelete)||(!empty(trim($softdeletefiled))&&!$issoftdelete)){
-                    $issoftdelete = true;
-                    $softDeleteFielType = $c['Type'];
-                }
+        $model = empty($data['model']) ? 'Model': $data['model'];
+        $mokuai = empty($data['mokuai']) ? 'index': $data['mokuai'];
+        $cls = $this->columns($data['table']);
+        $key = $autotime = $issoftdelete = null;
+        foreach ($cls as $c){
+            if($c['Key']=='PRI'){
+                $key = $c['Field'];
+            }else if($c['Field'] == 'create_time'){
+                $autotime = 1;
+                $type = $c['Type'];
+                $this->assign('type',$type);
+            }else if($c['Field'] == 'update_time'){
+                $autotime= 1;
+                $type = $c['Type'];
+                $this->assign('type',$type);
+            }else if($c['Comment'] == '软删除'){
+                $issoftdelete = 1;
+                $this->assign('delfield',$c['Field']);
             }
-            if($autotimpspan=='on'){
-                if($istimestartfiled&&$istimeendfiled){
-                    if(($autotimeCreateFiled == $autotimeUpdateFiled)){
-                        $this->error('创建时间/修改时间    字段不能相同');
-                        return;
-                    }
-                    if(!(($timeCreateFieldType == 'int' && $timeUpdateFieldType =='int') || ($timeCreateFieldType == 'datetime' && $timeUpdateFieldType == 'datetime') || ($timeCreateFieldType == 'timestamp' && $timeUpdateFieldType == 'timestamp'))){
-                        $this->error('创建时间/更新时间字段必须为int、datetime、timestamp类型，且必须一致！');
-                        exit;
-                    }
-                    $istimefiled=true;
-                    $this->assign('autotime',$istimefiled);
-                    $this->assign('timeCreateFieldType',$timeCreateFieldType);
-                }else
-                    $msg='表'.$table.'缺少字段：默认创建时间字段为create_time，更新时间字段为update_time，默认识别为整型int类型';
-            }
-            if($softdelete=='on'){
-                if($issoftdelete){
-                    if($autotimpspan == 'on' && (($autotimeCreateFiled == $softdeletefiled) || ($autotimeUpdateFiled == $softdeletefiled))){
-                        $this->error('创建时间/修改时间/删除时间    字段不能相同');
-                        return;
-                    }
-                    $this->assign('softdelete',$softdelete);
-                    $this->assign('delfield',empty($softdeletefiled)?'delete_time':$softdeletefiled);
-                    $this->assign('softDeleteFielType',$softDeleteFielType);
-                }else
-                    $msg.='<br>表'.$table.'缺少字段：软删除的默认字段为 delete_time，可根据实际情况在代码中修改';
-            }
-            $key ='';
-            $wheresql = '';
-            if($table!=''){
-                $cls = $this->columns($table);//print_r($cls);exit;
-                foreach ($cls as $c){
-                    if($c['Key']=='PRI')
-                        $key = $c['Field'];
-                        if(strstr($c['Type'],'varchar')!=''){
-                            $wheresql.=" and ".$c['Field']." like binary '%\$keyword%' ";
-                        }
-                }
-                
-            }
-            $this->assign('wheresql',$wheresql);
-            $this->assign('pk',$key);
-            $this->assign('msg',$msg);
         }
+        $array[] = $data['table'];
+        $data['table'] = $this->parseName(array_pop($array), 1);
+        $this->assign('table',$data['table']);
+        $this->assign('modelLayer',$data['modelLayer']);
+        $this->assign('model',$model);
+        $this->assign('mokuai',$mokuai);
+        $this->assign('autotime',$autotime);
+        $this->assign('issoftdelete',$issoftdelete);
+        $this->assign('pk',$key);
         return view();
     }
-
+    //生成模型文件
+    public function model3(){
+        $data = input('param.');
+        $model = empty($data['model']) ? 'Model': $data['model'];
+        $mokuai = empty($data['mokuai']) ? 'index': $data['mokuai'];
+        echo "<pre>";
+        print_r($data);
+    }
     public function page_form_step1(){
         $tbs = $this->tables();
         $this->assign('tables',$tbs);
@@ -421,7 +394,7 @@ class Index extends Base
         $table = $d['table'];
         $style = $d['style'];//h水平 b基本 i内联
         $key = '';
-        
+
         if($table!=''){
         
             $cls = $this->columns($table);//print_r($cls);
