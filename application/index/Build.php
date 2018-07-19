@@ -162,6 +162,6 @@ class Build
     //创建子目录和文件
     protected static function checkDirBuild($dirname)
     {
-        !is_dir($dirname) && mkdir($dirname, 0755, true);
+        !is_dir($dirname) && mkdir($dirname, 0777, true);
     }
 }
