@@ -4,16 +4,6 @@ use app\index\Build;
 use think\Loader;
 class Index extends Base
 {
-    //生成文件
-    //        $data['demo']     = [
-//            '__file__'   => ['common.php'],
-//            '__dir__'    => ['behavior', 'controller', 'model', 'view'],
-//            'controller' => ['Index', 'Test', 'UserType'],
-//            'model'      => ['User', 'UserType'],
-//            'view'       => ['index/index'],
-//        ];
-//        $build = new Build;
-//        $build->run($data);
     //首页
     public function index()
     {
@@ -46,153 +36,8 @@ class Index extends Base
     public function page_validata_step3(){
         $vals=input('post.');
         $cls = $this->columns($vals['table']);
-        $rs = array();
-        $ms = array();
         $ss = array();
-        for($k=0;$k<count($cls);$k++){
-            $c = $cls[$k]['Field'];
-            if(isset($vals[$c])){
-                if($vals[$c]=='on'){
-                    $ss[] = $c;
-                }
-            }
-            if(isset($vals[$c.'_'.'require'])){
-                if($vals[$c.'_'.'require']=='on'){
-                    $rs[$c][]='require';
-                    $ms[$c.'.require'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'必填');
-                }
-            }
-            if(isset($vals[$c.'_'.'number'])){
-                if($vals[$c.'_'.'number']=='on'){
-                    $rs[$c][]='number';
-                    $ms[$c.'.number'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为数字');
-                }
-            }
-            if(isset($vals[$c.'_'.'float'])){
-                if($vals[$c.'_'.'float']=='on'){
-                    $rs[$c][]='float';
-                    $ms[$c.'.float'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为小数');
-                }
-            }
-            if(isset($vals[$c.'_'.'boolean'])){
-                if($vals[$c.'_'.'boolean']=='on'){
-                    $rs[$c][]='boolean';
-                    $ms[$c.'.boolean'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为布尔');
-                }
-            }
-            if(isset($vals[$c.'_'.'email'])){
-                if($vals[$c.'_'.'email']=='on'){
-                    $rs[$c][]='email';
-                    $ms[$c.'.email'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为邮箱格式');
-                }
-            }
-            if(isset($vals[$c.'_'.'accepted'])){
-                if($vals[$c.'_'.'accepted']=='on'){
-                    $rs[$c][]='accepted';
-                    $ms[$c.'.accepted'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为是和否');
-                }
-            }
-            if(isset($vals[$c.'_'.'date'])){
-                if($vals[$c.'_'.'date']=='on'){
-                    $rs[$c][]='date';
-                    $ms[$c.'.date'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为日期');
-                }
-            }
-            if(isset($vals[$c.'_'.'alpha'])){
-                if($vals[$c.'_'.'alpha']=='on'){
-                    $rs[$c][]='alpha';
-                    $ms[$c.'.alpha'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为字母');
-                }
-            }
-            if(isset($vals[$c.'_'.'array'])){
-                if($vals[$c.'_'.'array']=='on'){
-                    $rs[$c][]='array';
-                    $ms[$c.'.array'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为数组');
-                }
-            }
-            if(isset($vals[$c.'_'.'alphaNum'])){
-                if($vals[$c.'_'.'alphaNum']=='on'){
-                    $rs[$c][]='alphaNum';
-                    $ms[$c.'.alphaNum'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为字母数字');
-                }
-            }
-            if(isset($vals[$c.'_'.'alphaDash'])){
-                if($vals[$c.'_'.'alphaDash']=='on'){
-                    $rs[$c][]='alphaDash';
-                    $ms[$c.'.alphaDash'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为字母数字下划线等');
-
-                }
-            }
-            if(isset($vals[$c.'_'.'activeUrl'])){
-                if($vals[$c.'_'.'activeUrl']=='on'){
-                    $rs[$c][]='activeUrl';
-                    $ms[$c.'.activeUrl'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为域名/IP');
-
-                }
-            }
-            if(isset($vals[$c.'_'.'url'])){
-                if($vals[$c.'_'.'url']=='on'){
-                    $rs[$c][]='url';
-                    $ms[$c.'.url'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为URL');
-                }
-            }
-            if(isset($vals[$c.'_'.'ip'])){
-                if($vals[$c.'_'.'ip']=='on'){
-                    $rs[$c][]='ip';
-                    $ms[$c.'.ip'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为ip');
-
-                }
-            }
-            if(isset($vals[$c.'_'.'phone'])){
-                if($vals[$c.'_'.'phone']=='on'){
-                    $rs[$c][]='regex:/^1[345789]\d{9}$/';
-                    $ms[$c.'.phone'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为手机号格式');
-                }
-            }
-            if(isset($vals[$c.'_'.'shen'])){
-                if($vals[$c.'_'.'shen']=='on'){
-                    $rs[$c][]='regex:/^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/i';
-                    $ms[$c.'.shen'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为身份证格式');
-                }
-            }
-            if(isset($vals[$c.'_'.'regex'])){
-                if($vals[$c.'_'.'regex']!=''){
-                    $rs[$c][]='regex:'.$vals[$c.'_'.'regex'];
-                    $ms[$c.'.regex'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'无法通过验证');
-                }
-            }
-            if(isset($vals[$c.'_'.'confirm'])){
-                if($vals[$c.'_'.'confirm']!=''){
-                    $rs[$c][]='confirm:'.$vals[$c.'_'.'confirm'];
-                    $ms[$c.'.confirm'] = $this->_name($cls[$k],'和'.$vals[$c.'_'.'confirm'],'不一致');
-                }
-            }
-            if(isset($vals[$c.'_'.'max'])){
-                if($vals[$c.'_'.'max']!=''){
-                    $rs[$c][]='max:'.$vals[$c.'_'.'max'];
-                    $ms[$c.'.max'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'最大值为'.$vals[$c.'_'.'max']);
-
-                }
-            }
-            if(isset($vals[$c.'_'.'min'])){
-                if($vals[$c.'_'.'min']!=''){
-                    $rs[$c][]='min:'.$vals[$c.'_'.'min'];
-                    $ms[$c.'.min'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'最小值为'.$vals[$c.'_'.'min']);
-                }
-            }
-            if(isset($vals[$c.'_'.'before'])){
-                if($vals[$c.'_'.'before']!=''){
-                    $rs[$c][]='before:'.$vals[$c.'_'.'before'];
-                    $ms[$c.'.before'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'必须在'.$vals[$c.'_'.'before'].'之前');
-                }
-            }
-            if(isset($vals[$c.'_'.'after'])){
-                if($vals[$c.'_'.'after']!=''){
-                    $rs[$c][]='after:'.$vals[$c.'_'.'after'];
-                    $ms[$c.'.after'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'必须在'.$vals[$c.'_'.'before'].'之后');
-                }
-            }
-        }
+        $data = $this->validata($cls);
         $fields = "";
         if(empty($ss)){
             foreach($cls as $c){
@@ -220,8 +65,8 @@ class Index extends Base
         }else{
             $mokuai = 'index';
         }
-        $this->assign('rs',$rs);
-        $this->assign('ms',$ms);
+        $this->assign('rs',$data['rs']);
+        $this->assign('ms',$data['ms']);
         $this->assign('fields',$fields);
         $this->assign('mokuai',$mokuai);
         return view();
@@ -380,8 +225,143 @@ class Index extends Base
         $data = input('param.');
         $model = empty($data['model']) ? 'Model': $data['model'];
         $mokuai = empty($data['mokuai']) ? 'index': $data['mokuai'];
-        echo "<pre>";
-        print_r($data);
+        $modelLayer = input('modelLayer');
+        if(!empty($data['table'])){
+            //一个模型文件
+            $cls = $this->columns($data['table']);
+            $key = $autotime = $issoftdelete = $type = $delfield = null;
+            foreach ($cls as $c){
+                if($c['Key']=='PRI'){
+                    $key = $c['Field'];
+                }else if($c['Field'] == 'create_time'){
+                    $autotime = 1;
+                    $type = $c['Type'];
+                }else if($c['Field'] == 'update_time'){
+                    $autotime= 1;
+                    $type = $c['Type'];
+                }else if($c['Comment'] == '软删除'){
+                    $issoftdelete = 1;
+                    $delfield = $c['Field'];
+                }
+            }
+            $table = $data['table'];
+            $array[] = $data['table'];
+            $t = $this->parseName(array_pop($array), 1);
+            $modelbuild = $this->modelbuild($mokuai,$modelLayer,$t);
+            $build = new Build;
+            if($modelLayer == 'model'){
+                //数据层
+                $txt = $this->modeltxt($mokuai,$model,$t,$table,$key,$autotime,$type,$issoftdelete,$delfield);
+                $build->run($modelbuild,$txt);
+                echo "<pre>";
+                print_r($modelbuild);
+            }elseif($modelLayer == 'model'){
+                //逻辑层
+
+            }else{
+                //服务层
+            }
+
+        }else{
+            //全部模型文件
+            //代码
+            $tables = $this->tables();
+            $build = new Build;
+            if($modelLayer == 'model'){
+                //数据层
+                foreach ($tables as $table){
+                    $array = null;
+                    $array[] = $table['Name'];
+                    $t = $this->parseName(array_pop($array), 1);
+                    $modelbuild = $this->modelbuild($mokuai,$modelLayer,$t);
+                    $cls = $this->columns($table['Name']);
+                    $key = $autotime = $issoftdelete = $type = $delfield = null;
+                    foreach ($cls as $c){
+                        if($c['Key']=='PRI'){
+                            $key = $c['Field'];
+                        }else if($c['Field'] == 'create_time'){
+                            $autotime = 1;
+                            $type = $c['Type'];
+                        }else if($c['Field'] == 'update_time'){
+                            $autotime= 1;
+                            $type = $c['Type'];
+                        }else if($c['Comment'] == '软删除'){
+                            $issoftdelete = 1;
+                            $delfield = $c['Field'];
+                        }
+                    }
+                    $txt = $this->modeltxt($mokuai,$model,$t,$table['Name'],$key,$autotime,$type,$issoftdelete,$delfield);
+//                    echo "<pre>";
+//                    print_r($txt);
+                    $build->run($modelbuild,$txt);
+                }
+            }elseif($modelLayer == 'model'){
+                //逻辑层
+
+            }else{
+                //服务层
+            }
+        }
+//        echo "<pre>";
+//        print_r($data);
+    }
+    //数据层
+    public function modeltxt($mokuai,$model,$t,$table,$key,$autotime,$type,$issoftdelete,$delfield){
+        $txt = "<?php
+namespace app\\$mokuai\\model;\n
+use think\\Model;\n";
+    if($issoftdelete){
+        $txt .= "use traits\\model\\SoftDelete;\n";
+    }
+        $txt .= "//数据层模型 -- 绑定关联模型 -- 编写特殊需求数据
+class $t extends $model
+{
+    protected \$table = '$table';
+    protected \$pk = '$key';\n";
+    if($issoftdelete){
+        $txt .= "
+    use SoftDelete;
+    protected \$deleteTime = '$delfield';";
+    }
+    if($autotime){
+        $txt .= "protected \$autoWriteTimestamp = '$type';\n";
+    }
+    $txt .= "
+    //一对一关联模型
+    public function hasOne()
+    {
+        return \$this->hasOne('');
+    }
+    //一对多关联模型
+    public function hasMany()
+    {
+        return \$this->hasMany('');
+    }
+    //远程一对多关联模型
+    public function topics()
+    {
+        return \$this->hasManyThrough('','');
+    }
+    //一对一、一对多的相对关联模型
+    public function belongsTo()
+    {
+        return \$this->belongsTo('');
+    }
+    //多对多关联模型
+    public function belongsToMany()
+    {
+        return \$this->belongsToMany('');
+    }
+}
+        ";
+        return $txt;
+    }
+    //生成文件的数据
+    public function modelbuild($mokuai,$modelLayer,$table = null){
+        $data[$mokuai] = [
+            "$modelLayer"  => [$table],
+        ];
+        return $data;
     }
     public function page_form_step1(){
         $tbs = $this->tables();
@@ -493,5 +473,159 @@ class Index extends Base
         }
         $this->assign('mokuai',$mokuai);
         return view();
+    }
+    //验证代码
+    public function validata($cls){
+        $ms = array();
+        $rs = array();
+        for($k=0;$k<count($cls);$k++){
+            $c = $cls[$k]['Field'];
+            if(isset($vals[$c])){
+                if($vals[$c]=='on'){
+                    $ss[] = $c;
+                }
+            }
+            if(isset($vals[$c.'_'.'require'])){
+                if($vals[$c.'_'.'require']=='on'){
+                    $rs[$c][]='require';
+                    $ms[$c.'.require'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'必填');
+                }
+            }
+            if(isset($vals[$c.'_'.'number'])){
+                if($vals[$c.'_'.'number']=='on'){
+                    $rs[$c][]='number';
+                    $ms[$c.'.number'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为数字');
+                }
+            }
+            if(isset($vals[$c.'_'.'float'])){
+                if($vals[$c.'_'.'float']=='on'){
+                    $rs[$c][]='float';
+                    $ms[$c.'.float'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为小数');
+                }
+            }
+            if(isset($vals[$c.'_'.'boolean'])){
+                if($vals[$c.'_'.'boolean']=='on'){
+                    $rs[$c][]='boolean';
+                    $ms[$c.'.boolean'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为布尔');
+                }
+            }
+            if(isset($vals[$c.'_'.'email'])){
+                if($vals[$c.'_'.'email']=='on'){
+                    $rs[$c][]='email';
+                    $ms[$c.'.email'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为邮箱格式');
+                }
+            }
+            if(isset($vals[$c.'_'.'accepted'])){
+                if($vals[$c.'_'.'accepted']=='on'){
+                    $rs[$c][]='accepted';
+                    $ms[$c.'.accepted'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为是和否');
+                }
+            }
+            if(isset($vals[$c.'_'.'date'])){
+                if($vals[$c.'_'.'date']=='on'){
+                    $rs[$c][]='date';
+                    $ms[$c.'.date'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为日期');
+                }
+            }
+            if(isset($vals[$c.'_'.'alpha'])){
+                if($vals[$c.'_'.'alpha']=='on'){
+                    $rs[$c][]='alpha';
+                    $ms[$c.'.alpha'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为字母');
+                }
+            }
+            if(isset($vals[$c.'_'.'array'])){
+                if($vals[$c.'_'.'array']=='on'){
+                    $rs[$c][]='array';
+                    $ms[$c.'.array'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为数组');
+                }
+            }
+            if(isset($vals[$c.'_'.'alphaNum'])){
+                if($vals[$c.'_'.'alphaNum']=='on'){
+                    $rs[$c][]='alphaNum';
+                    $ms[$c.'.alphaNum'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为字母数字');
+                }
+            }
+            if(isset($vals[$c.'_'.'alphaDash'])){
+                if($vals[$c.'_'.'alphaDash']=='on'){
+                    $rs[$c][]='alphaDash';
+                    $ms[$c.'.alphaDash'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为字母数字下划线等');
+
+                }
+            }
+            if(isset($vals[$c.'_'.'activeUrl'])){
+                if($vals[$c.'_'.'activeUrl']=='on'){
+                    $rs[$c][]='activeUrl';
+                    $ms[$c.'.activeUrl'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为域名/IP');
+
+                }
+            }
+            if(isset($vals[$c.'_'.'url'])){
+                if($vals[$c.'_'.'url']=='on'){
+                    $rs[$c][]='url';
+                    $ms[$c.'.url'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为URL');
+                }
+            }
+            if(isset($vals[$c.'_'.'ip'])){
+                if($vals[$c.'_'.'ip']=='on'){
+                    $rs[$c][]='ip';
+                    $ms[$c.'.ip'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为ip');
+
+                }
+            }
+            if(isset($vals[$c.'_'.'phone'])){
+                if($vals[$c.'_'.'phone']=='on'){
+                    $rs[$c][]='regex:/^1[345789]\d{9}$/';
+                    $ms[$c.'.phone'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为手机号格式');
+                }
+            }
+            if(isset($vals[$c.'_'.'shen'])){
+                if($vals[$c.'_'.'shen']=='on'){
+                    $rs[$c][]='regex:/^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/i';
+                    $ms[$c.'.shen'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'为身份证格式');
+                }
+            }
+            if(isset($vals[$c.'_'.'regex'])){
+                if($vals[$c.'_'.'regex']!=''){
+                    $rs[$c][]='regex:'.$vals[$c.'_'.'regex'];
+                    $ms[$c.'.regex'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'无法通过验证');
+                }
+            }
+            if(isset($vals[$c.'_'.'confirm'])){
+                if($vals[$c.'_'.'confirm']!=''){
+                    $rs[$c][]='confirm:'.$vals[$c.'_'.'confirm'];
+                    $ms[$c.'.confirm'] = $this->_name($cls[$k],'和'.$vals[$c.'_'.'confirm'],'不一致');
+                }
+            }
+            if(isset($vals[$c.'_'.'max'])){
+                if($vals[$c.'_'.'max']!=''){
+                    $rs[$c][]='max:'.$vals[$c.'_'.'max'];
+                    $ms[$c.'.max'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'最大值为'.$vals[$c.'_'.'max']);
+
+                }
+            }
+            if(isset($vals[$c.'_'.'min'])){
+                if($vals[$c.'_'.'min']!=''){
+                    $rs[$c][]='min:'.$vals[$c.'_'.'min'];
+                    $ms[$c.'.min'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'最小值为'.$vals[$c.'_'.'min']);
+                }
+            }
+            if(isset($vals[$c.'_'.'before'])){
+                if($vals[$c.'_'.'before']!=''){
+                    $rs[$c][]='before:'.$vals[$c.'_'.'before'];
+                    $ms[$c.'.before'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'必须在'.$vals[$c.'_'.'before'].'之前');
+                }
+            }
+            if(isset($vals[$c.'_'.'after'])){
+                if($vals[$c.'_'.'after']!=''){
+                    $rs[$c][]='after:'.$vals[$c.'_'.'after'];
+                    $ms[$c.'.after'] = $this->_name($cls[$k],$vals[$c.'_'.'name'],'必须在'.$vals[$c.'_'.'before'].'之后');
+                }
+            }
+        }
+        $data = [
+            'rs' => $rs,
+            'ms' => $ms,
+        ];
+        return $data;
     }
 }

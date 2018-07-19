@@ -10,7 +10,7 @@ namespace app\index;
 class Build
 {
     //根据传入的 build 资料创建目录和文件
-    public static function run(array $build = [], $namespace = 'app', $suffix = false)
+    public static function run(array $build = [], $content = null, $namespace = 'app', $suffix = false)
     {
         // 锁定
         $lock = APP_PATH . 'build.lock';
@@ -31,7 +31,7 @@ class Build
                     self::buildFile($list);
                 } else {
                     // 创建模块
-                    self::module($module, $list, $namespace, $suffix);
+                    self::module($module, $list, $namespace, $suffix,$content);
                 }
             }
             // 解除锁定
@@ -65,7 +65,7 @@ class Build
         }
     }
     //创建模块
-    public static function module($module = '', $list = [], $namespace = 'app', $suffix = false)
+    public static function module($module = '', $list = [], $namespace = 'app', $suffix = false,$content1 = null)
     {
         $module = $module ?: '';
         // 创建模块目录
@@ -109,10 +109,10 @@ class Build
                     $class    = $val . ($suffix ? ucfirst($path) : '');
                     switch ($path) {
                         case 'controller': // 控制器
-                            $content = "<?php\nnamespace {$space};\n\nclass {$class}\n{\n\n}";
+                            $content = empty($content1) ? "<?php\nnamespace {$space};\n\nclass {$class}\n{\n\n}":$content1;
                             break;
                         case 'model': // 模型
-                            $content = "<?php\nnamespace {$space};\n\nuse think\Model;\n\nclass {$class} extends Model\n{\n\n}";
+                            $content = empty($content1) ? "<?php\nnamespace {$space};\n\nuse think\Model;\n\nclass {$class} extends Model\n{\n\n}":$content1;
                             break;
                         case 'view': // 视图
                             $filename = $modulePath . $path . DS . $val . '.html';
@@ -121,7 +121,7 @@ class Build
                             break;
                         default:
                             // 其他文件
-                            $content = "<?php\nnamespace {$space};\n\nclass {$class}\n{\n\n}";
+                            $content = empty($content1) ? "<?php\nnamespace {$space};\n\nclass {$class}\n{\n\n}":$content1;
                     }
                     if (!is_file($filename)) {
                         file_put_contents($filename, $content);
@@ -145,7 +145,7 @@ class Build
                 file_get_contents(THINK_PATH . 'tpl' . DS . 'default_index.tpl')
             );
             self::checkDirBuild(dirname($filename));
-            file_put_contents($filename, $content);
+            file_put_contents($filename, $content.PHP_EOL);
         }
     }
    //创建模块的公共文件
@@ -157,7 +157,7 @@ class Build
             file_put_contents($config, "<?php\n//配置文件\nreturn [\n\n];");
         }
         $common = APP_PATH . ($module ? $module . DS : '') . 'common.php';
-        if (!is_file($common)) file_put_contents($common, "<?php\n");
+        if (!is_file($common)) file_put_contents($common, "<?php\n//模块公共文件");
     }
     //创建子目录和文件
     protected static function checkDirBuild($dirname)

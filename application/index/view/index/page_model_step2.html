@@ -39,7 +39,7 @@ use think\Model;
 use traits\model\SoftDelete;
 {/notempty}
 //数据层模型 -- 绑定关联模型 -- 编写特殊需求数据
-class {$table|ucfirst} extends {$model}
+class {$table} extends {$model}
 
 {
     protected $table = '{$table}';
@@ -72,11 +72,6 @@ class {$table|ucfirst} extends {$model}
         return $this->belongsTo('');
     }
     //多对多关联模型
-    public function belongsToMany()
-    {
-        return $this->belongsToMany('');
-    }
-    //多对多的相对关联模型
     public function belongsToMany()
     {
         return $this->belongsToMany('');
