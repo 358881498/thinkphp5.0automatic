@@ -82,30 +82,30 @@ class {$table} extends {$model}
 namespace app\{$mokuai}\{$modelLayer};
 use think\Model;
 //逻辑层模型 -- 调用数据层模型 -- 编写其他逻辑
-class {$table|ucfirst} extends Model
+class {$table} extends Model
 {
     //获取多条数据
     public function getAll($where = null)
     {
-        $data = model('{$table}')
+        $res = model('{$table}')
             ->all($where);
-        return $data;
+        return $res;
     }
     //获取分页数据
     public function getPage($where = null)
     {
-        $data = model('{$table}')
+        $res = model('{$table}')
             ->where($where)
             ->paginate(config("list_rows"),false,['query'=>request()->param()]);
-        return $data;
+        return $res;
     }
     //获取一条数据
     public function getOne($where = 1)
     {
         //默认获取主键为1的数据
-        $data = model('{$table}')
+        $res = model('{$table}')
             ->get($where);
-        return $data;
+        return $res;
     }
     //查找并更新
     public function getAndEdit($where = null, $data = null)
@@ -114,67 +114,67 @@ class {$table|ucfirst} extends Model
             return '$data或$where变量为空';
         }
         //默认获取主键为1的数据
-        $data = model('{$table}')
+        $res = model('{$table}')
             ->get($where)
             ->save($data);
-        return $data;
+        return $res;
     }
     //主键更新
-    public function update($data)
+    public function updateid($data)
     {
-        $data = model('{$table}')
+        $res = model('{$table}')
             ->update($data);
-        return $data;
+        return $res;
     }
     //条件更新
     public function updateWhere($data,$where)
     {
-        $data = model('{$table}')
+        $res = model('{$table}')
             ->where($where)
             ->update($data);
-        return $data;
+        return $res;
     }
     //批量更新
     public function saveAll($data)
     {
         //$data必须为二维数组
-        $data = model('{$table}')
+        $res = model('{$table}')
             ->saveAll($data);
-        return $data;
+        return $res;
     }
     //add -- 过滤非数据表字段
     public function add($data)
     {
         //返回自增主键
-        $data = model('{$table}')
+        $res = model('{$table}')
             ->allowField(true)
-            ->save();
-        return $data->{$pk};;
+            ->save($data);
+        return $res->{$pk};;
     }
     //批量add
     public function addAll($data)
     {
         //$data必须为二维数组
-        $data = model('{$table}')
+        $res = model('{$table}')
             ->saveAll($data, false);
-        return $data;
+        return $res;
     }
     //delete
     public function del($where)
     {
-        $data = model('{$table}')
+        $res = model('{$table}')
             ->destroy($where);
-        return $data;
+        return $res
     }
 }
 {else /}
 namespace app\{$mokuai}\{$modelLayer};
 use think\Model;
-//服务层模型 -- 调用逻辑层模型
+//服务层模型 -- 调用逻辑层模型 -- 与控制器交互
 class {$table} extends Model
 {
     //查询
-    public function get()
+    public function findData()
     {
         $where = $this->getWhere(input('param.'));
         $data = model('{$table}','logic')

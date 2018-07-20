@@ -112,6 +112,7 @@ class Build
                             $content = empty($content1) ? "<?php\nnamespace {$space};\n\nclass {$class}\n{\n\n}":$content1;
                             break;
                         case 'model': // 模型
+                            self::checkDirBuild(dirname($filename));
                             $content = empty($content1) ? "<?php\nnamespace {$space};\n\nuse think\Model;\n\nclass {$class} extends Model\n{\n\n}":$content1;
                             break;
                         case 'view': // 视图
@@ -121,6 +122,7 @@ class Build
                             break;
                         default:
                             // 其他文件
+                            self::checkDirBuild(dirname($filename));
                             $content = empty($content1) ? "<?php\nnamespace {$space};\n\nclass {$class}\n{\n\n}":$content1;
                     }
                     if (!is_file($filename)) {

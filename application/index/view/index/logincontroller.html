@@ -35,12 +35,12 @@ class Login extends Controller
         if (true !== $result) {
             return res(10001, '', $result);
         };
-        //公共方法，查询账号
         $where = [
             'login_name' => input('login_name'),
         ];
-        $table = 'admin_user'
-        $data = find_data($table,$where);
+        $data = db('sys_user')
+            ->where($where)
+            ->find();
         //登录名不存在
         if (!$data) {
             return res(10002);
