@@ -11,7 +11,13 @@ function dd($data){
         return;
     }
     if(is_object($data)){
-        print_r($data->toArray());
+        $data = $data->toArray();
+        foreach($data as $k=>$v){
+            if(is_object($v)){
+                $data[$k] = $v->toArray();
+            }
+        }
+        print_r($data);
         return;
     }
     print_r($data);

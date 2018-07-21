@@ -722,12 +722,12 @@ class $table extends Model
         return \$data;
     }
     //组成数据
-    public function getData(\$data)
+    public function getData(\$data = null)
     {
         return \$data;
     }
     //组成查询条件
-    public function getWhere(\$where)
+    public function getWhere(\$where = null)
     {
         return \$where;
     }
@@ -793,7 +793,7 @@ class $table extends Model
         return \$res;
     }
     //批量更新
-    public function saveAll(\$data)
+    public function allSave(\$data)
     {
         //\$data必须为二维数组
         \$res = model('$table')
@@ -814,7 +814,7 @@ class $table extends Model
     {
         //\$data必须为二维数组
         \$res = model('$table')
-            ->saveAll(\$data, false);
+            ->saveAll(\$data);
         return \$res;
     }
     //delete
@@ -850,27 +850,27 @@ class $t extends $model
         }
         $txt .= "
     //一对一关联模型
-    public function hasOne()
+    public function hasOne1()
     {
         return \$this->hasOne('');
     }
     //一对多关联模型
-    public function hasMany()
+    public function hasMany1()
     {
         return \$this->hasMany('');
     }
     //远程一对多关联模型
-    public function topics()
+    public function topics1()
     {
         return \$this->hasManyThrough('','');
     }
     //一对一、一对多的相对关联模型
-    public function belongsTo()
+    public function belongsTo1()
     {
         return \$this->belongsTo('');
     }
     //多对多关联模型
-    public function belongsToMany()
+    public function belongsToMany1()
     {
         return \$this->belongsToMany('');
     }
