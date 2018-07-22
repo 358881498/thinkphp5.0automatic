@@ -1,30 +1,24 @@
-ThinkPHP5 代码生成器
-===============
+ThinkPHP5 自动生成代码和mvc文件
 
-[![Total Downloads](https://poser.pugx.org/topthink/think/downloads)](https://packagist.org/packages/topthink/think)
-[![Latest Stable Version](https://poser.pugx.org/topthink/think/v/stable)](https://packagist.org/packages/topthink/think)
-[![Latest Unstable Version](https://poser.pugx.org/topthink/think/v/unstable)](https://packagist.org/packages/topthink/think)
-[![License](https://poser.pugx.org/topthink/think/license)](https://packagist.org/packages/topthink/think)
+公共方法 扩展配置 验证器 模型 控制器  视图  自动生成代码和文件。
 
-
-欢迎使用ThinkPHP5 代码生成器！
-
-“模型”  “控制器”  "验证器"   "编辑表单"   “管理表格”  自动生成。
-
- + 1、本软件生成的代码基于：ThinkPHP5.0.20  +  mysql数据库
+ 1、代码基于：ThinkPHP5.0.20  +  mysql数据库
  
- + 2、步骤：请首先建立好数据库，然后修改本程序中的"/application/database.php"数据库配置
-注意：建议将每个字段标注“备注”，字段的“备注”在本生成器中非常有用，在生成验证器、表单、管理表格时会首先读取字段“备注”的信息
+ 2、步骤：请首先建立好数据库，然后修改本程序中的"/application/database.php"数据库配置
+    注意：建议将每个字段标注“备注”，字段的“备注”在本生成器中非常有用，在生成验证器、模型，表单、管理表格时会首先读取字段“备注”的信息
 
- + 3、[模型]生成中仅实现了简单的功能，暂做参考演示！
+ 3、公共方法，和扩展配置都是很简单的，只有生成代码，没有生成文件，根据需要是否使用
 
- + 4、[表格]、[表单]生成使用Bootstrap框架的样式！
+ 4、[模型]模型会根据表来创建，一张表对应一个数据层模型，如果你使用到服务层、逻辑层，也会创建对应的服务层、逻辑层模型
+    根据自己的需求生成。
+    服务层模型，带有调用逻辑层的增删改查4个方法
+    逻辑层模型，带有调用数据层的常用几个方法
+    数据层模型，绑定表和主键，软删除，自动写入时间、一对多，一对一、多对多等关联模型
 
- + 5、使用本程序生成的代码，最少需要生成[控制器]、[验证器]。在控制器中调用到了验证器生成的类。
+ 5、[验证器]选择字段信息后，字段生成相应的验证器代码。目前只有生成代码，后续会完成，生成文件
 
- + 6、所有功能“步骤1”都需要选择操作的数据表。
+ 6、[控制器] 选择模块后，自动生成控制器文件，并带有List、Edit、Add、Del4个方法，逻辑需要自己写。
 
- + 7、“新版本”会自动在菜单栏提醒，可以在论坛进行反馈！
+ ps:如果有什么好的建议，欢迎提出
 
 
-  © 2017 by TP5代码生成器 (http://tp.azhe35.cn)
