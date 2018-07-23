@@ -16,6 +16,7 @@ class Api extends Base
         $code = 123456;
         $templateParam = array("code" => $code);
         $sms = new \dome\Aliyunsms();
+        //在extend下有对应的压缩文件，请解压到当前目录
         $m = $sms->send($phone,$templateParam);
         //类中有说明，默认返回的数组格式，如果需要json，在自行修改类，或者在这里将$m转换后在输出
         print_r($m);
@@ -26,6 +27,7 @@ class Api extends Base
     {
         if(!empty($_FILES['img'])){
             $oss = new \dome\Oss();
+            //在extend下有对应的压缩文件，请解压到当前目录
             $img = $oss->ossImg($_FILES['img'],'ossimg',0);
             print_r($img);
         }
@@ -40,6 +42,7 @@ class Api extends Base
             'birthday' => '规范的3',
         ];
         $export = new \dome\Excel();
+        //在vendor下有对应的压缩文件，请解压到当前目录
         $export->export($name, $header,$data);
     }
 }
