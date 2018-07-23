@@ -1,9 +1,7 @@
-{extend name="share:layout"/}
-{block name="title"}验证器 - 步骤3 - 完成{/block}
-{block name="body"}
-<h3>验证器- 步骤3 - 完成</h3>
+{layout name="layout" /}
+<h3>验证器代码 - 完成</h3>
 <br>
-<textarea readonly style="width: 100%; height: 750px; font-family: &quot;Courier New&quot;; font-size: 12px; line-height: 1.5;">
+<textarea readonly class="width">
 namespace app\{$mokuai}\validate;
 
 use think\Validate;
@@ -27,4 +25,3 @@ class {$table|ucfirst} extends Validate
     ];
 }
 </textarea>
-{/block}

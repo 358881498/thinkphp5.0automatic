@@ -5,7 +5,7 @@
  * Date: 2018/7/22
  * Time: 19:32
  */
-namespace Dome;
+namespace Demo;
 use Aliyun\Core\Config;
 use Aliyun\Core\Profile\DefaultProfile;
 use Aliyun\Core\DefaultAcsClient;

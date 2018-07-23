@@ -1,8 +1,7 @@
-{extend name="share:layout"/}
-{block name="title"}公共方法{/block}
-{block name="body"}
-<h4>公共方法</h4>
-<textarea readonly style="width: 100%; height: 750px; font-size: 12px; line-height: 1.5;">
+{layout name="layout" /}
+<div>
+    <h4>公共方法</h4>
+<textarea readonly class="width">
 //打印数组
 function dd($data){
     echo "<pre>";
@@ -60,4 +59,4 @@ function recursive($list, $parent_id=0){
     return $arr;
 }
 </textarea>
-{/block}
+</div>

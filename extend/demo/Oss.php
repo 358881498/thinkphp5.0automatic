@@ -1,5 +1,5 @@
 <?php
-namespace Dome;
+namespace Demo;
 use OssClient;
 //路径  extend/OSS
 class Oss
