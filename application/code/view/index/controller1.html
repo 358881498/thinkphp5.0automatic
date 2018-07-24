@@ -1,6 +1,4 @@
-{extend name="share:layout"/}
-{block name="title"}控制器 - 步骤1{/block}
-{block name="body"}
+{layout name="layout" /}
 <h3>控制器 - 步骤1</h3>
 {switch name="type" }
 {case value="1"}
@@ -59,7 +57,7 @@
     </font><br><br>
     生成控制器<br><br>
 </h4>
-<form id="api" action="{:url('page_controller_step2')}" method="get">
+<form id="api" action="{:url('controller2')}" method="get">
     <input name="type" id="type1" type="hidden" />
     <h4>
         <input type="checkbox" name="controller" value="Base" id="controller"><label for="controller">是否继承Base公共控制器</label>
@@ -129,6 +127,7 @@
 </form>
 {/case}
 {/switch}
+<script type="text/javascript" src="/static/layui/jquery.min.js"></script>
 <script type="text/javascript">
     function api1(type){
         if(type == 1){
@@ -174,4 +173,3 @@
         });
     });
 </script>
-{/block}

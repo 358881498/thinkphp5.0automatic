@@ -1,7 +1,4 @@
-{extend name="share:layout"/}
-{block name="title"}表单生成 - 步骤2 - 完成{/block}
-
-{block name="body"}
+{layout name="layout" /}
 <h3>表单生成 - 步骤2 - 完成<small>对应控制器中的(add、edit)方法</small></h3>
 {php}if($style=='h'){echo '水平表单:标题和文本框左右结构';}else if($style=='b'){echo '基本表单:标题和文本框上下结构';}else if($style=='i'){echo '内联表单:所有项目在一行显示（登录功能常用）';}{/php}
 <br>
@@ -68,4 +65,3 @@
 
 <a href="javascript:var h=$('#code').val();$('#run').html(h);$('#run').toggle();">查看效果</a>
 <div id="run" style="display:none;"></div>
-{/block}

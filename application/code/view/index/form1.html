@@ -1,9 +1,7 @@
-{extend name="share:layout"/}
-{block name="title"}表单生成 - 步骤1{/block}
+{layout name="layout" /}
 
-{block name="body"}
 <h3>表单生成 - 步骤1<small>对应控制器中的(add、edit)方法</small></h3>
-<form action="{:url('page_form_step2')}" method="get">
+<form action="{:url('form2')}" method="get">
 选择表：
 <select name="table">
 <option value=""></option>
@@ -19,6 +17,3 @@
 <br><br>
 <input type="submit" value="提交">
 </form>
-
-
-{/block}

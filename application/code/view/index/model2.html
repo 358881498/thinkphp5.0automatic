@@ -1,6 +1,4 @@
-{extend name="share:layout"/}
-{block name="title"}模型 - 步骤2 - 完成{/block}
-{block name="body"}
+{layout name="layout" /}
 <h3>
     {if condition="$modelLayer eq 'model'"}
     数据层 模型代码生成 - 步骤2 - 完成
@@ -218,4 +216,3 @@ class {$table} extends Model
 }
 {/if}
 </textarea>
-{/block}

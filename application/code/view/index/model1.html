@@ -1,7 +1,4 @@
-{extend name="share:layout"/}
-{block name="title"}模型 - 步骤1{/block}
-
-{block name="body"}
+{layout name="layout" /}
 {eq name='type' value='1'}
 <h3>模型代码生成 - 步骤1</h3>
 <h4>
@@ -11,7 +8,7 @@
     4、当表里存在字段为create_time、update_time的时，模型会开启自动写入时间<br><br>
     5、当表里存在备注为软删除的字段时，模型会开启软删除<br><br>
 </h4>
-<form action="{:url('page_model_step2')}" method="get">
+<form action="{:url('model2')}" method="get">
     <h4 style="color: red;">
         <input type="checkbox" name="model" value="Base"><label for="controller">是否继承公共模型</label>
     </h4>
@@ -36,7 +33,7 @@
         {/volist}
     </select>
     <br><br>
-    <button type="submit" class="btn btn-w-m btn-primary">模型代码生成</button>
+    <button type="submit" class="layui-btn">模型代码生成</button>
 </form>
 {else/}
 <h3>模型文件生成 - 步骤1</h3>
@@ -70,4 +67,3 @@
 <button type="submit" class="btn btn-w-m btn-primary">模型文件生成</button>
 </form>
 {/eq}
-{/block}

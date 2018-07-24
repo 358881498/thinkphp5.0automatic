@@ -1,6 +1,5 @@
 <div class="layui-header">
     <a href="{:url('index')}"><div class="layui-logo">tp5自动生成代码和mvc文件</div></a>
-    <!-- 头部区域（可配合layui已有的水平导航） -->
     <ul class="layui-nav layui-layout-left">
         <li class="layui-nav-item"><a href="{:url('common')}">公共方法</a></li>
         <li class="layui-nav-item"><a href="{:url('extra')}">生成配置文件</a></li>
@@ -39,3 +38,13 @@
         </li>
     </ul>
 </div>
+<script>
+    layui.use('element', function(){
+        var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+        //监听导航点击
+        element.on('nav(demo)', function(elem){
+            //console.log(elem)
+            layer.msg(elem.text());
+        });
+    });
+</script>
