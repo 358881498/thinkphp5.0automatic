@@ -1,20 +1,30 @@
 {layout name="layout" /}
-
-<h3>管理表格生成 - 步骤1<small>对应控制器中的(manager)方法</small></h3>
-<form action="{:url('table1')}" method="post">
-选择表：
-<select name="table">
-<option value=""></option>
-{volist name="tables" id="vo"}
-    <option value="{$vo.Name}" {eq name="Think.get.table" value="$vo.Name"}selected{/eq}>{$vo.Name} -- {$vo.Comment}</option>
-{/volist}
-</select>
-<br><br>选择表单样式：
+<script type="text/javascript" src="/static/layui/jquery.min.js"></script>
+<h3>表格生成</h3>
 <br>
-<input type="checkbox" name="style[]" id="tbtw" value="table-striped"><label for="tbtw">条纹</label>
-<input type="checkbox" name="style[]" id="tbbk" value="table-bordered"><label for="tbbk">边框</label>
-<input type="checkbox" name="style[]" id="tbxt" value="table-hover"><label for="tbxt">鼠标悬停</label>
-<input type="checkbox" name="style[]" id="tbjs" value="table-condensed"><label for="tbjs">紧缩</label>
-<br><br>
-<input type="submit" value="提交">
-</form>
+<textarea id="code" class="width">
+    <table id="demo" lay-filter="test"></table>
+<script>
+    layui.use('table', function(){
+        var table = layui.table;
+        table.render({
+            elem: '#demo'
+            ,height: 315
+            ,url: '/demo/table/user/' //数据接口
+            ,page: true //开启分页
+            ,cols: [[ //表头
+                {field: 'id', title: 'ID', sort: true, fixed: 'left'}
+                ,{field: 'username', title: '用户名'}
+                ,{field: 'sex', title: '性别'}
+                ,{field: 'city', title: '城市'}
+                ,{field: 'sign', title: '签名'}
+                ,{field: 'experience', title: '积分', sort: true}
+                ,{field: 'score', title: '评分', sort: true}
+                ,{field: 'classify', title: '职业'}
+                ,{field: 'wealth', title: '财富'}
+                ,{field: 'set', title: '操作'}
+            ]]
+        });
+    });
+</script>
+</textarea>

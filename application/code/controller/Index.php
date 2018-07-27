@@ -844,66 +844,9 @@ class ".ucfirst($controller_name)." extends $controller
      * 视图
      * */
     public function form1(){
-        $tbs = $this->tables();
-        $this->assign('tables',$tbs);
-        return view();
-    }
-    public function form2(){
-        $d = input('get.');
-        $table = $d['table'];
-        $style = $d['style'];//h水平 b基本 i内联
-        $key = '';
-
-        if($table!=''){
-
-            $cls = $this->columns($table);//print_r($cls);
-            foreach ($cls as $c){
-                if($c['Key']=='PRI'){
-                    $key = $c['Field'];
-                    break;
-                }
-            }
-            $this->assign('cls',$cls);
-            $this->assign('key',$key);
-            $this->assign('table',$table);
-            $this->assign('style',$style);
-
-        }else{
-            $this->error('请选择要操作的数据表！');
-        }
-
         return view();
     }
     public function table1(){
-        $tbs = $this->tables();
-        $this->assign('tables',$tbs);
         return view();
     }
-    public function table2(){
-        $d = input('post.');
-        $table = $d['table'];//dump(input('post.style'));exit;
-        $styles ='';
-        if(isset($d['style']))
-            $styles = implode(' ',$d['style']);
-        $key="";
-
-        if($table!=''){
-            $cls = $this->columns($table);//print_r($cls);
-            foreach ($cls as $c){
-                if($c['Key']=='PRI'){
-                    $key = $c['Field'];
-                    break;
-                }
-            }
-            $this->assign('cls',$cls);
-            $this->assign('k',$key);
-            $this->assign('table',$table);
-            $this->assign('styles',$styles);
-        }else{
-            $this->error('请选择要操作的数据表！');
-        }
-
-        return view();
-    }
-
 }
