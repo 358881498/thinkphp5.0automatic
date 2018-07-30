@@ -849,4 +849,12 @@ class ".ucfirst($controller_name)." extends $controller
     public function table1(){
         return view();
     }
+    /*
+    * demo
+    * */
+    //阿里云短信接口
+    public function demo(){
+        $this->assign('type',input('id'));
+        return view();
+    }
 }
