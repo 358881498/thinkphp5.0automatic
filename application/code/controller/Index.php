@@ -7,9 +7,7 @@
  */
 
 namespace app\code\controller;
-use app\index\Build;
-use think\Loader;
-
+use app\code\Build;
 class Index extends Base
 {
     //首页
@@ -25,19 +23,809 @@ class Index extends Base
     public function extra(){
         return view();
     }
-    //获取模块
-    public function mokuai(){
-        $dir = dirname(dirname(dirname(__FILE__)));
+    /*
+     * 控制器
+     * */
+    //公共控制器
+    public function basecontroller(){
+        if(input('mokuai')){
+            $mokuai = input('mokuai');
+        }else{
+            $mokuai = 'index';
+        }
+        if(input('file') == 1){
+            $modelbuild = $this->cbuild($mokuai,'controller','Base');
+            $txt = $this->baseControllerCode($mokuai);
+            $build = new Build;
+            $build->run($modelbuild,$txt);
+            $this->success('公共控制器创建完成');
+        }else{
+            $this->assign('mokuai',$mokuai);
+            return view();
+        }
+    }
+    //公共控制器文件代码
+    public function baseControllerCode($mokuai){
+        $txt = "<?php
+namespace app\\$mokuai\\controller;
+use think\\Controller;
+use think\\Db;
+use think\\Url;
+use think\\Response;
+use think\\Request;
+use think\\Loader;
+use think\\facade\\Hook;
+use Demo;
+class Base extends Controller
+{
+    //定义前置方法名
+    protected \$beforeActionList = [
+        'base',
+    ];
+    //空方法
+    public function _empty()
+    {
+        return \$this->error('空方法');//可跳转到404
+    }
+    //前置方法
+    public function base()
+    {
+
+    }
+}";
+        return $txt;
+    }
+    //空控制器
+    public function errorcontroller(){
+        if(input('mokuai')){
+            $mokuai = input('mokuai');
+        }else{
+            $mokuai = 'index';
+        }
+        if(input('file') == 1){
+            $modelbuild = $this->cbuild($mokuai,'controller','Error');
+            $txt = $this->errorControllerCode($mokuai);
+            $build = new Build;
+            $build->run($modelbuild,$txt);
+            $this->success('空控制器创建完成');
+        }else{
+            $this->assign('mokuai',$mokuai);
+            return view();
+        }
+    }
+    //空控制器文件代码
+    public function errorControllerCode($mokuai){
+        $txt = "<?php
+namespace app\\$mokuai\\controller;
+use think\\Controller;
+use think\\Request;
+//空控制器
+class Error extends Controller
+{
+    //空控制器
+    public function index(Request \$request)
+    {
+        return \$this->error(\$request->controller().'是空控制器！');//可跳转到404
+    }
+}
+";
+        return $txt;
+    }
+    //分层控制器
+    public function eventcontroller(){
+        $name = input('event_name') ? ucfirst(input('event_name')) : null;
+        if(!$name){
+            $this->error('分层控制器名字必填');
+        }
+        if(input('mokuai')){
+            $mokuai = input('mokuai');
+        }else{
+            $mokuai = 'index';
+        }
+        if(input('file') == 1){
+            $modelbuild = $this->cbuild($mokuai,'event',$name);
+            $txt = $this->eventControllerCode($mokuai,$name);
+            $build = new Build;
+            $build->run($modelbuild,$txt);
+            $this->success('分层控制器创建完成');
+        }else{
+            $this->assign('mokuai',$mokuai);
+            $this->assign('name',$name);
+            return view();
+        }
+    }
+    //分层控制器文件代码
+    public function eventControllerCode($mokuai,$name){
+        $txt = "<?php
+namespace app\\$mokuai\\event;
+
+class $name
+{
+    public function insert()
+    {
+        return 'insert';
+    }
+
+    public function update(\$id)
+    {
+        return 'update:'.\$id;
+    }
+
+    public function delete(\$id)
+    {
+        return 'delete:'.\$id;
+    }
+}
+";
+        return $txt;
+    }
+
+    //生成控制器文件
+    public function controller2(){
+        $controller_name = input('controller_name');
+        if(empty($controller_name)){
+            $this->error('缺少控制器名');
+        }
+        $mokuai = input('mokuai');
+        $modelLayer = input('modelLayer');
+        $controller = input('controller');
+        $function_name = input('function_name');
+        $model = input('model');
+        $auth = input('auth');
+        $function_name = empty($function_name) ? $controller_name:$function_name;
+        $model = empty($model) ? 'model':$model;
+        $controller = empty($controller) ? 'Controller':$controller;
+        $mokuai = empty($mokuai) ? 'index':$mokuai;
+        $modelbuild = $this->cbuild($mokuai,'controller',$controller_name);
+        $resources = input('resources');
+        if($resources){
+            $txt = $this->resourcescontrollerbuild($mokuai,$modelLayer,$controller,$controller_name,$function_name,$model,$auth);
+        }else{
+            $txt = $this->controllerbuild($mokuai,$modelLayer,$controller,$controller_name,$function_name,$model,$auth);
+        }
+        $build = new Build;
+        $build->run($modelbuild,$txt);
+        $this->success('控制器完成');
+    }
+    //资源控制器文件代码
+    public function resourcescontrollerbuild($mokuai,$modelLayer,$controller,$controller_name,$function_name,$model,$auth){
+        $txt = "<?php
+namespace app\\$mokuai\\controller;
+use think\\Controller;
+//".ucfirst($controller_name)." -- 资源控制器
+class ".ucfirst($controller_name)." extends $controller
+{
+";
+        if($auth){
+            $txt .="
+    //设置控制器中间件
+    protected \$middleware = ['$auth'];
+    ";
+        }
+        $txt .="
+    protected function initialize()
+    {
+        //初始化
+
+    }
+    //index -- GET
+    public function index()
+    {";
+        if($modelLayer == 'model'){
+            $txt .="
+        \$model = model('$model');";
+        }else{
+            $txt .="
+        \$model = model('$model','$modelLayer');";
+        }
+        $txt .="
+        return json();
+    }";
+        $txt .= "
+    //创建 -- GET
+    public function create()
+    {";
+        if($modelLayer == 'model'){
+            $txt .="
+        \$model = model('$model');";
+        }else{
+            $txt .="
+        \$model = model('$model','$modelLayer');";
+        }
+        $txt .= "
+        return json();
+    }";
+        $txt .= "
+    //保存 -- POST
+    public function save()
+    {";
+        if($modelLayer == 'model'){
+            $txt .="
+        \$model = model('$model');";
+        }else{
+            $txt .="
+        \$model = model('$model','$modelLayer');";
+        }
+        $txt .= "
+        return json();
+    }";
+        $txt .= "
+    //读取 -- GET
+    public function read(\$id)
+    {";
+        if($modelLayer == 'model'){
+            $txt .="
+        \$model = model('$model');";
+        }else{
+            $txt .="
+        \$model = model('$model','$modelLayer');";
+        }
+        $txt .= "
+        return json();
+    }";
+        $txt .= "
+    //编辑 -- GET
+    public function edit(\$id)
+    {";
+        if($modelLayer == 'model'){
+            $txt .="
+        \$model = model('$model');";
+        }else{
+            $txt .="
+        \$model = model('$model','$modelLayer');";
+        }
+        $txt .= "
+        return json();
+    }";
+        $txt .= "
+    //更新 -- PUT
+    public function update(\$id)
+    {";
+        if($modelLayer == 'model'){
+            $txt .="
+        \$model = model('$model');";
+        }else{
+            $txt .="
+        \$model = model('$model','$modelLayer');";
+        }
+        $txt .= "
+        return json();
+    }";
+        $txt .= "
+    //删除 -- DELETE
+    public function delete(\$id)
+    {";
+        if($modelLayer == 'model'){
+            $txt .="
+        \$model = model('$model');";
+        }else{
+            $txt .="
+        \$model = model('$model','$modelLayer');";
+        }
+        $txt .= "
+        return json();
+    }
+}";
+        return $txt;
+    }
+    //控制器文件代码
+    public function controllerbuild($mokuai,$modelLayer,$controller,$controller_name,$function_name,$model,$auth){
+        $txt = "<?php
+namespace app\\$mokuai\\controller;
+use think\\Controller;
+class ".ucfirst($controller_name)." extends $controller
+{
+";
+        if($auth){
+            $txt .="
+    //设置控制器中间件
+    protected \$middleware = ['$auth'];
+    ";
+        }
+        $txt .="
+    protected function initialize()
+    {
+        //初始化
+
+    }
+    //list
+    public function ".$function_name."List()
+    {";
+        if($modelLayer == 'model'){
+            $txt .="
+        \$model = model('$model');";
+        }else{
+            $txt .="
+        \$model = model('$model','$modelLayer');";
+        }
+        $txt .="
+        return json();
+    }";
+        $txt .= "
+    //edit
+    public function ".$function_name."Edit()
+    {";
+        if($modelLayer == 'model'){
+            $txt .="
+        \$model = model('$model');";
+        }else{
+            $txt .="
+        \$model = model('$model','$modelLayer');";
+        }
+        $txt .= "
+        return json();
+    }";
+        $txt .= "
+    //add
+    public function ".$function_name."Add()
+    {";
+        if($modelLayer == 'model'){
+            $txt .="
+        \$model = model('$model');";
+        }else{
+            $txt .="
+        \$model = model('$model','$modelLayer');";
+        }
+        $txt .= "
+        return json();
+    }";
+        $txt .= "
+    //del
+    public function ".$function_name."Del()
+    {";
+        if($modelLayer == 'model'){
+            $txt .="
+        \$model = model('$model');";
+        }else{
+            $txt .="
+        \$model = model('$model','$modelLayer');";
+        }
+        $txt .= "
+        return json();
+    }
+}";
+        return $txt;
+    }
+
+    //生成控制器代码
+    public function controller3(){
+        $data = input('param.');
+        $this->assign('function_name',$data['function_name']);
+        return view();
+    }
+
+    //控制器
+    public function controller1(){
+        $mokuai = $this->mokuai();
+        $this->assign('mokuai',$mokuai);
+        $tbs = $this->tables();
+        $this->assign('tables',$tbs);
+        $this->assign('type',input('id'));
+        return view();
+    }
+    //获取模型
+    public function controller_step2(){
+        $mokuai = input('mokuai');
+        if(empty($mokuai)){
+            return false;
+        }
+        $dir1 = dirname(dirname(dirname(__FILE__))).'\\'.$mokuai."\\model";
         $files = array();
-        if(is_dir($dir)){
-            $child_dirs = scandir($dir);
+        if(is_dir($dir1)){
+            $child_dirs = scandir($dir1);
             foreach($child_dirs as $child_dir){
-                if($child_dir != '.' && $child_dir != '..' && $child_dir != "extra" && !strstr($child_dir, '.')){
-                    $files[] = $child_dir;
+                if(strstr($child_dir, '.php')){
+                    $files['model'][] = basename($child_dir,".php");
                 }
             }
         }
-        return $files;
+        return json($files);
+    }
+    /*
+     * 生成模型代码
+     * */
+    //模型页面
+    public function model1(){
+        $this->assign('type',input('id'));
+        $this->assign('mokuai',$this->mokuai());
+        //代码
+        $tables = $this->tables();
+        $this->assign('tables',$tables);
+        return view();
+    }
+    //生成模型代码
+    public function model2(){
+        $data = input('param.');
+        if(empty($data['table'])){
+            $this->error('缺少表');
+            return;
+        }
+        $table = $this->table($data['table']);
+        if(strstr($table, '中间表') || strstr($table, '关联表')){
+            $this->assign('associated',1);
+        }else{
+            $this->assign('associated',2);
+        }
+        $model = empty($data['model']) ? 'Model': $data['model'];
+        $mokuai = empty($data['mokuai']) ? 'index': $data['mokuai'];
+        $cls = $this->columns($data['table']);
+        $res =  $this->timestamp($cls);
+        $array[] = $data['table'];
+        $data['table'] = $this->parseName(array_pop($array), 1);
+        $this->assign('table',$data['table']);
+        $this->assign('modelLayer',$data['modelLayer']);
+        $this->assign('model',$model);
+        $this->assign('mokuai',$mokuai);
+        $this->assign('autotime',$res['autotime']);
+        $this->assign('issoftdelete',$res['issoftdelete']);
+        $this->assign('delfield',$res['delfield']);
+        $this->assign('type',$res['type']);
+        $this->assign('pk',$res['key']);
+        $this->assign('time',$res['time']);
+        return view();
+    }
+    //生成模型文件
+    public function model3(){
+        $data = input('param.');
+        $model = empty($data['model']) ? 'Model': $data['model'];
+        $mokuai = empty($data['mokuai']) ? 'index': $data['mokuai'];
+        $modelLayer = input('modelLayer');
+        if(!empty($data['table'])){
+            //一个模型文件
+            $cls = $this->columns($data['table']);
+            $res =  $this->timestamp($cls);
+            $key = $autotime = $issoftdelete = $type = $delfield = null;
+            foreach ($cls as $c){
+                if($c['Key']=='PRI'){
+                    $key = $c['Field'];
+                }else if($c['Field'] == 'create_time'){
+                    $autotime = 1;
+                    $type = $c['Type'];
+                }else if($c['Field'] == 'update_time'){
+                    $autotime= 1;
+                    $type = $c['Type'];
+                }else if($c['Comment'] == '软删除'){
+                    $issoftdelete = 1;
+                    $delfield = $c['Field'];
+                }
+            }
+            $table = $data['table'];
+            $array[] = $data['table'];
+            $t = $this->parseName(array_pop($array), 1);
+            $modelbuild = $this->modelbuild($mokuai,$modelLayer,$t);
+            $build = new Build;
+            if($modelLayer == 'model'){
+                //数据层
+                $txt = $this->modeltxt($mokuai,$model,$t,$table,$key,$autotime,$type,$issoftdelete,$delfield,$res['time']);
+                $build->run($modelbuild,$txt);
+                $this->success('数据层模型完成');
+            }elseif($modelLayer == 'logic'){
+                //逻辑层
+                $txt = $this->logictxt($mokuai,$t,$key);
+                $build->run($modelbuild,$txt);
+                $this->success('逻辑层模型完成');
+            }else{
+                //服务层
+                $txt = $this->servicetxt($mokuai,$t);
+                $build->run($modelbuild,$txt);
+                $this->success('服务层模型完成');
+            }
+        }else{
+            //全部模型文件
+            //代码
+            $tables = $this->tables();
+            $build = new Build;
+            if($modelLayer == 'model'){
+                //数据层
+                foreach ($tables as $table){
+                    $array = null;
+                    $array[] = $table['Name'];
+                    $t = $this->parseName(array_pop($array), 1);
+                    $modelbuild = $this->modelbuild($mokuai,$modelLayer,$t);
+                    $cls = $this->columns($table['Name']);
+                    $res =  $this->timestamp($cls);
+                    $key = $autotime = $issoftdelete = $type = $delfield = null;
+                    foreach ($cls as $c){
+                        if($c['Key']=='PRI'){
+                            $key = $c['Field'];
+                        }else if($c['Field'] == 'create_time'){
+                            $autotime = 1;
+                            $type = $c['Type'];
+                        }else if($c['Field'] == 'update_time'){
+                            $autotime= 1;
+                            $type = $c['Type'];
+                        }else if($c['Comment'] == '软删除'){
+                            $issoftdelete = 1;
+                            $delfield = $c['Field'];
+                        }
+                    }
+                    $txt = $this->modeltxt($mokuai,$model,$t,$table['Name'],$key,$autotime,$type,$issoftdelete,$delfield,$res['time']);
+                    $build->run($modelbuild,$txt);
+                }
+                $this->success('数据层模型完成');
+            }
+            elseif($modelLayer == 'logic'){
+                //逻辑层
+                foreach ($tables as $table){
+                    $array = null;
+                    $array[] = $table['Name'];
+                    $t = $this->parseName(array_pop($array), 1);
+                    $modelbuild = $this->modelbuild($mokuai,$modelLayer,$t);
+                    $cls = $this->columns($table['Name']);
+                    $key = null;
+                    foreach ($cls as $c){
+                        if($c['Key']=='PRI'){
+                            $key = $c['Field'];
+                        }
+                    }
+                    $txt = $this->logictxt($mokuai,$t,$key);
+                    $build->run($modelbuild,$txt);
+                }
+                $this->success('逻辑层模型完成');
+            }
+            else{
+                //服务层
+                foreach ($tables as $table){
+                    $array = null;
+                    $array[] = $table['Name'];
+                    $t = $this->parseName(array_pop($array), 1);
+                    $modelbuild = $this->modelbuild($mokuai,$modelLayer,$t);
+                    $txt = $this->servicetxt($mokuai,$t);
+                    $build->run($modelbuild,$txt);
+                }
+                $this->success('服务层模型完成');
+            }
+        }
+    }
+    //时间、软删除属性
+    public function timestamp($cls){
+        $data = [
+            'key' => null,
+            'autotime' => null,
+            'type' => null,
+            'issoftdelete' => null,
+            'delfield' => null,
+            'time' => array(),
+        ];
+        foreach ($cls as $c){
+            if($c['Key']=='PRI'){
+                $data['key'] = $c['Field'];
+            }else if($c['Field'] == 'create_time'){
+                $data['autotime'] = 1;
+                $data['type'] = $c['Type'];
+            }else if($c['Field'] == 'update_time'){
+                $data['autotime'] = 1;
+                $data['type'] = $c['Type'];
+            }else if($c['Comment'] == '软删除'){
+                $data['issoftdelete'] = 1;
+                $data['delfield'] = $c['Field'];
+            }else if($c['Type'] == "datetime" || $c['Type'] == "timestamp"){
+                $data['time'][] = [
+                    'Field' => $c['Field'],
+                    'type' => $c['Type'],
+                ];
+            }
+        }
+        return $data;
+    }
+
+    //数据层
+    public function modeltxt($mokuai,$model,$t,$table,$key,$autotime,$type,$issoftdelete,$delfield,$time){
+        $txt = "<?php
+namespace app\\$mokuai\\model;\n
+use think\\Model;\n";
+        if($issoftdelete){
+            $txt .= "use traits\\model\\SoftDelete;\n";
+        }
+        $txt .= "//数据层模型 -- 绑定关联模型 -- 编写特殊需求数据
+class $t extends $model
+{
+    //绑定表
+    protected \$table = '$table';
+    //绑定主键
+    protected \$pk = '$key';\n";
+        if($issoftdelete){
+            $txt .= "
+    //使用软删除
+    use SoftDelete;
+    //设置软删除字段
+    protected \$deleteTime = '$delfield';
+    ";
+        }
+        if($autotime){
+            $txt .= "//设置自动写入时间戳的字段类型
+    protected \$autoWriteTimestamp = '$type';\n";
+        }
+        if(!empty($time)){
+            $txt .= "   //设置类型自动转换
+    protected \$type = [\n";
+            foreach ($time as $k=>$v){
+                $txt .= "       '".$v['Field']."' => '".$v['type']."',\n";
+            }
+            $txt .= "    ];";
+        }
+        $txt .= "
+
+    // 模型初始化
+    protected static function init()
+    {
+        //TODO:初始化内容
+    }
+
+    //一对一关联模型
+    public function hasOne1()
+    {
+        return \$this->hasOne('');
+    }
+    //一对多关联模型
+    public function hasMany1()
+    {
+        return \$this->hasMany('');
+    }
+    //远程一对多关联模型
+    public function topics1()
+    {
+        return \$this->hasManyThrough('','');
+    }
+    //一对一、一对多的相对关联模型
+    public function belongsTo1()
+    {
+        return \$this->belongsTo('');
+    }
+    //多对多关联模型
+    public function belongsToMany1()
+    {
+        return \$this->belongsToMany('');
+    }
+}
+        ";
+        return $txt;
+    }
+    //服务层
+    public function servicetxt($mokuai,$table){
+        $txt = "<?php
+namespace app\\$mokuai\service;
+use think\Model;
+//服务层模型 -- 调用逻辑层模型 -- 与控制器交互
+class $table extends Model
+{
+    //查询
+    public function findData()
+    {
+        \$where = \$this->getWhere(input('param.'));
+        \$data = model('$table','logic')
+            ->getAll(\$where);
+        return \$data;
+    }
+    //添加
+    public function add()
+    {
+        \$post = \$this->getData(input('param.'));
+        \$data = model('$table','logic')
+            ->add(\$post);
+        return \$data;
+    }
+    //编辑
+    public function edit()
+    {
+        \$post = \$this->getData(input('param.'));
+        \$data = model('$table','logic')
+            ->updateWhere(\$post);
+        return \$data;
+    }
+    //删除
+    public function del()
+    {
+        \$where = \$this->getWhere(input('param.'));
+        \$data = model('$table','logic')
+            ->del(\$where);
+        return \$data;
+    }
+    //组成数据
+    public function getData(\$data = null)
+    {
+        return \$data;
+    }
+    //组成查询条件
+    public function getWhere(\$where = null)
+    {
+        return \$where;
+    }
+}";
+        return $txt;
+    }
+    //逻辑层
+    public function logictxt($mokuai,$table,$key){
+        $txt = "<?php
+namespace app\\$mokuai\logic;
+use think\Model;
+//逻辑层模型 -- 调用数据层模型 -- 编写其他逻辑
+class $table extends Model
+{
+    //获取多条数据
+    public function getAll(\$where = null)
+    {
+        \$res = model('$table')
+            ->all(\$where);
+        return \$res;
+    }
+    //获取分页数据
+    public function getPage(\$where = null)
+    {
+        \$res = model('$table')
+            ->where(\$where)
+            ->paginate(config(\"list_rows\"),false,['query'=>request()->param()]);
+        return \$res;
+    }
+    //获取一条数据
+    public function getOne(\$where = 1)
+    {
+        //默认获取主键为1的数据
+        \$res = model('$table')
+            ->get(\$where);
+        return \$res;
+    }
+    //查找并更新
+    public function getAndEdit(\$where = null, \$data = null)
+    {
+        if(empty(\$data) || empty(\$where)){
+            return '\$data或\$where变量为空';
+        }
+        //默认获取主键为1的数据
+        \$res = model('$table')
+            ->get(\$where)
+            ->save(\$data);
+        return \$res;
+    }
+    //主键更新
+    public function updateid(\$data)
+    {
+        \$res = model('$table')
+            ->update(\$data);
+        return \$res;
+    }
+    //条件更新
+    public function updateWhere(\$data,\$where)
+    {
+        \$res = model('$table')
+            ->where(\$where)
+            ->update(\$data);
+        return \$res;
+    }
+    //批量更新
+    public function allSave(\$data)
+    {
+        //\$data必须为二维数组
+        \$res = model('$table')
+            ->saveAll(\$data);
+        return \$res;
+    }
+    //add -- 过滤非数据表字段
+    public function add(\$data)
+    {
+        //返回自增主键
+        \$res = model('$table')
+            ->allowField(true)
+            ->save();
+        return \$res->$key;
+    }
+    //批量add
+    public function addAll(\$data)
+    {
+        //\$data必须为二维数组
+        \$res = model('$table')
+            ->saveAll(\$data);
+        return \$res;
+    }
+    //delete
+    public function del(\$where)
+    {
+        \$res = model('$table')
+            ->destroy(\$where);
+        return \$res;
+    }
+}";
+        return $txt;
     }
     /*
      * 验证器
@@ -61,7 +849,7 @@ class Index extends Base
         $this->assign('mokuai',$mokuai);
         return view();
     }
-    //生成验证器代码
+    //生成验证器
     public function validata3(){
         $vals = input('param.');
         $cls = $this->columns($vals['table']);
@@ -74,15 +862,27 @@ class Index extends Base
                 }
             }
             $fields = trim($fields,',');
-        }else{
+        }
+        else{
             foreach($data['ss'] as $c){
                 $fields.= "'".$c."',";
             }
             $fields = trim($fields,',');
         }
         if($vals['is_code'] == 2){
-
-        }else{
+            //生成验证器文件
+            $mokuai = input('mokuai');
+            $dir = 'validata';
+            $name = input('validata_name') ?? $this->parseName(input('table'),1);
+            $name = ucfirst($name);
+            $modelbuild = $this->modelbuild($mokuai, $dir, $name);
+            $txt = $this->validatacode($mokuai, $name, $data, $fields);
+            $build = new Build;
+            $build->run($modelbuild,$txt);
+            $this->success('验证器文件创建完成');
+        }
+        else{
+            //生成验证器代码
             if(empty($vals['validata_name'])){
                 $this->assign('table',$vals['table']);
             }else{
@@ -101,6 +901,39 @@ class Index extends Base
         }
 
     }
+    //验证器生成文件代码
+    private function validatacode($mokuai, $name, $data, $fields){
+        $txt = "<?php
+namespace app\\$mokuai\\validate;
+
+use think\\Validate;
+
+class $name extends Validate
+{
+    protected \$rule = [
+    ";
+        foreach($data['rs'] as $k => $v){
+            $txt .="    '$k' => '".implode('|', $v)."',
+    ";
+        }
+        $txt .="
+    ];
+    protected \$message = [
+    ";
+        foreach($data['ms'] as $k => $v){
+            $txt .="    '$k' => '$v',
+    ";
+        }
+        $txt .="
+    ];
+    protected \$scene = [
+        'add'   =>  [$fields],
+        'edit'  =>  [$fields],
+
+    ];
+}";
+        return $txt;
+    }
     private function _getf($c){
         if($c['Comment']!=''){
             return $c['Comment'];
@@ -115,7 +948,7 @@ class Index extends Base
         }
         return $data;
     }
-    //验证器代码
+    //验证代码
     public function validata($cls,$vals){
         $ms = array();
         $rs = array();
@@ -271,575 +1104,9 @@ class Index extends Base
         ];
         return $data;
     }
-    /*
-     * 生成模型代码
-     * */
-    //模型页面
-    public function model1(){
-        $this->assign('type',input('id'));
-        $this->assign('mokuai',$this->mokuai());
-        //代码
-        $tables = $this->tables();
-        $this->assign('tables',$tables);
-        return view();
-    }
-    //数据表名转换成符合模型命名规格的字符串
-    public function parseName($name, $type = 0, $ucfirst = true){
-        if ($type) {
-            $name = preg_replace_callback('/_([a-zA-Z])/', function ($match) {
-                return strtoupper($match[1]);
-            }, $name);
-            return $ucfirst ? ucfirst($name) : lcfirst($name);
-        }
-        return strtolower(trim(preg_replace("/[A-Z]/", "_\\0", $name), "_"));
-    }
-    //生成模型代码
-    public function model2(){
-        $data = input('param.');
-        if(empty($data['table'])){
-            $this->error('缺少表');
-            return;
-        }
-        $model = empty($data['model']) ? 'Model': $data['model'];
-        $mokuai = empty($data['mokuai']) ? 'index': $data['mokuai'];
-        $cls = $this->columns($data['table']);
-        $key = $autotime = $issoftdelete = null;
-        foreach ($cls as $c){
-            if($c['Key']=='PRI'){
-                $key = $c['Field'];
-            }else if($c['Field'] == 'create_time'){
-                $autotime = 1;
-                $type = $c['Type'];
-                $this->assign('type',$type);
-            }else if($c['Field'] == 'update_time'){
-                $autotime= 1;
-                $type = $c['Type'];
-                $this->assign('type',$type);
-            }else if($c['Comment'] == '软删除'){
-                $issoftdelete = 1;
-                $this->assign('delfield',$c['Field']);
-            }
-        }
-        $array[] = $data['table'];
-        $data['table'] = $this->parseName(array_pop($array), 1);
-        $this->assign('table',$data['table']);
-        $this->assign('modelLayer',$data['modelLayer']);
-        $this->assign('model',$model);
-        $this->assign('mokuai',$mokuai);
-        $this->assign('autotime',$autotime);
-        $this->assign('issoftdelete',$issoftdelete);
-        $this->assign('pk',$key);
-        return view();
-    }
-    //生成模型文件
-    public function model3(){
-        $data = input('param.');
-        $model = empty($data['model']) ? 'Model': $data['model'];
-        $mokuai = empty($data['mokuai']) ? 'index': $data['mokuai'];
-        $modelLayer = input('modelLayer');
-        if(!empty($data['table'])){
-            //一个模型文件
-            $cls = $this->columns($data['table']);
-            $key = $autotime = $issoftdelete = $type = $delfield = null;
-            foreach ($cls as $c){
-                if($c['Key']=='PRI'){
-                    $key = $c['Field'];
-                }else if($c['Field'] == 'create_time'){
-                    $autotime = 1;
-                    $type = $c['Type'];
-                }else if($c['Field'] == 'update_time'){
-                    $autotime= 1;
-                    $type = $c['Type'];
-                }else if($c['Comment'] == '软删除'){
-                    $issoftdelete = 1;
-                    $delfield = $c['Field'];
-                }
-            }
-            $table = $data['table'];
-            $array[] = $data['table'];
-            $t = $this->parseName(array_pop($array), 1);
-            $modelbuild = $this->modelbuild($mokuai,$modelLayer,$t);
-            $build = new Build;
-            if($modelLayer == 'model'){
-                //数据层
-                $txt = $this->modeltxt($mokuai,$model,$t,$table,$key,$autotime,$type,$issoftdelete,$delfield);
-                $build->run($modelbuild,$txt);
-                $this->success('数据层模型完成');
-            }elseif($modelLayer == 'logic'){
-                //逻辑层
-                $txt = $this->logictxt($mokuai,$t,$key);
-                $build->run($modelbuild,$txt);
-                $this->success('逻辑层模型完成');
-            }else{
-                //服务层
-                $txt = $this->servicetxt($mokuai,$t);
-                $build->run($modelbuild,$txt);
-                $this->success('服务层模型完成');
-            }
-        }else{
-            //全部模型文件
-            //代码
-            $tables = $this->tables();
-            $build = new Build;
-            if($modelLayer == 'model'){
-                //数据层
-                foreach ($tables as $table){
-                    $array = null;
-                    $array[] = $table['Name'];
-                    $t = $this->parseName(array_pop($array), 1);
-                    $modelbuild = $this->modelbuild($mokuai,$modelLayer,$t);
-                    $cls = $this->columns($table['Name']);
-                    $key = $autotime = $issoftdelete = $type = $delfield = null;
-                    foreach ($cls as $c){
-                        if($c['Key']=='PRI'){
-                            $key = $c['Field'];
-                        }else if($c['Field'] == 'create_time'){
-                            $autotime = 1;
-                            $type = $c['Type'];
-                        }else if($c['Field'] == 'update_time'){
-                            $autotime= 1;
-                            $type = $c['Type'];
-                        }else if($c['Comment'] == '软删除'){
-                            $issoftdelete = 1;
-                            $delfield = $c['Field'];
-                        }
-                    }
-                    $txt = $this->modeltxt($mokuai,$model,$t,$table['Name'],$key,$autotime,$type,$issoftdelete,$delfield);
-                    $build->run($modelbuild,$txt);
-                }
-                $this->success('数据层模型完成');
-            }
-            elseif($modelLayer == 'logic'){
-                //逻辑层
-                foreach ($tables as $table){
-                    $array = null;
-                    $array[] = $table['Name'];
-                    $t = $this->parseName(array_pop($array), 1);
-                    $modelbuild = $this->modelbuild($mokuai,$modelLayer,$t);
-                    $cls = $this->columns($table['Name']);
-                    $key = null;
-                    foreach ($cls as $c){
-                        if($c['Key']=='PRI'){
-                            $key = $c['Field'];
-                        }
-                    }
-                    $txt = $this->logictxt($mokuai,$t,$key);
-                    $build->run($modelbuild,$txt);
-                }
-                $this->success('逻辑层模型完成');
-            }
-            else{
-                //服务层
-                foreach ($tables as $table){
-                    $array = null;
-                    $array[] = $table['Name'];
-                    $t = $this->parseName(array_pop($array), 1);
-                    $modelbuild = $this->modelbuild($mokuai,$modelLayer,$t);
-                    $txt = $this->servicetxt($mokuai,$t);
-                    $build->run($modelbuild,$txt);
-                }
-                $this->success('服务层模型完成');
-            }
-        }
-    }
-    //服务层
-    public function servicetxt($mokuai,$table){
-        $txt = "<?php
-namespace app\\$mokuai\service;
-use think\Model;
-//服务层模型 -- 调用逻辑层模型 -- 与控制器交互
-class $table extends Model
-{
-    //查询
-    public function findData()
-    {
-        \$where = \$this->getWhere(input('param.'));
-        \$data = model('$table','logic')
-            ->getAll(\$where);
-        return \$data;
-    }
-    //添加
-    public function add()
-    {
-        \$post = \$this->getData(input('param.'));
-        \$data = model('$table','logic')
-            ->add(\$post);
-        return \$data;
-    }
-    //编辑
-    public function edit()
-    {
-        \$post = \$this->getData(input('param.'));
-        \$data = model('$table','logic')
-            ->updateWhere(\$post);
-        return \$data;
-    }
-    //删除
-    public function del()
-    {
-        \$where = \$this->getWhere(input('param.'));
-        \$data = model('$table','logic')
-            ->del(\$where);
-        return \$data;
-    }
-    //组成数据
-    public function getData(\$data = null)
-    {
-        return \$data;
-    }
-    //组成查询条件
-    public function getWhere(\$where = null)
-    {
-        return \$where;
-    }
-}";
-        return $txt;
-    }
-    //逻辑层
-    public function logictxt($mokuai,$table,$key){
-        $txt = "<?php
-namespace app\\$mokuai\logic;
-use think\Model;
-//逻辑层模型 -- 调用数据层模型 -- 编写其他逻辑
-class $table extends Model
-{
-    //获取多条数据
-    public function getAll(\$where = null)
-    {
-        \$res = model('$table')
-            ->all(\$where);
-        return \$res;
-    }
-    //获取分页数据
-    public function getPage(\$where = null)
-    {
-        \$res = model('$table')
-            ->where(\$where)
-            ->paginate(config(\"list_rows\"),false,['query'=>request()->param()]);
-        return \$res;
-    }
-    //获取一条数据
-    public function getOne(\$where = 1)
-    {
-        //默认获取主键为1的数据
-        \$res = model('$table')
-            ->get(\$where);
-        return \$res;
-    }
-    //查找并更新
-    public function getAndEdit(\$where = null, \$data = null)
-    {
-        if(empty(\$data) || empty(\$where)){
-            return '\$data或\$where变量为空';
-        }
-        //默认获取主键为1的数据
-        \$res = model('$table')
-            ->get(\$where)
-            ->save(\$data);
-        return \$res;
-    }
-    //主键更新
-    public function updateid(\$data)
-    {
-        \$res = model('$table')
-            ->update(\$data);
-        return \$res;
-    }
-    //条件更新
-    public function updateWhere(\$data,\$where)
-    {
-        \$res = model('$table')
-            ->where(\$where)
-            ->update(\$data);
-        return \$res;
-    }
-    //批量更新
-    public function allSave(\$data)
-    {
-        //\$data必须为二维数组
-        \$res = model('$table')
-            ->saveAll(\$data);
-        return \$res;
-    }
-    //add -- 过滤非数据表字段
-    public function add(\$data)
-    {
-        //返回自增主键
-        \$res = model('$table')
-            ->allowField(true)
-            ->save();
-        return \$res->$key;
-    }
-    //批量add
-    public function addAll(\$data)
-    {
-        //\$data必须为二维数组
-        \$res = model('$table')
-            ->saveAll(\$data);
-        return \$res;
-    }
-    //delete
-    public function del(\$where)
-    {
-        \$res = model('$table')
-            ->destroy(\$where);
-        return \$res;
-    }
-}";
-        return $txt;
-    }
-    //数据层
-    public function modeltxt($mokuai,$model,$t,$table,$key,$autotime,$type,$issoftdelete,$delfield){
-        $txt = "<?php
-namespace app\\$mokuai\\model;\n
-use think\\Model;\n";
-        if($issoftdelete){
-            $txt .= "use traits\\model\\SoftDelete;\n";
-        }
-        $txt .= "//数据层模型 -- 绑定关联模型 -- 编写特殊需求数据
-class $t extends $model
-{
-    protected \$table = '$table';
-    protected \$pk = '$key';\n";
-        if($issoftdelete){
-            $txt .= "
-    use SoftDelete;
-    protected \$deleteTime = '$delfield';";
-        }
-        if($autotime){
-            $txt .= "protected \$autoWriteTimestamp = '$type';\n";
-        }
-        $txt .= "
-    //一对一关联模型
-    public function hasOne1()
-    {
-        return \$this->hasOne('');
-    }
-    //一对多关联模型
-    public function hasMany1()
-    {
-        return \$this->hasMany('');
-    }
-    //远程一对多关联模型
-    public function topics1()
-    {
-        return \$this->hasManyThrough('','');
-    }
-    //一对一、一对多的相对关联模型
-    public function belongsTo1()
-    {
-        return \$this->belongsTo('');
-    }
-    //多对多关联模型
-    public function belongsToMany1()
-    {
-        return \$this->belongsToMany('');
-    }
-}
-        ";
-        return $txt;
-    }
-    //生成文件的数据
-    public function modelbuild($mokuai,$modelLayer,$table = null){
-        $data[$mokuai] = [
-            '__dir__' => [$modelLayer],
-            "$modelLayer"  => [$table],
-        ];
-        return $data;
-    }
-    //生成文件的数据
-    public function cbuild($mokuai,$controller,$table){
-        $data[$mokuai] = [
-            '__dir__' => [$controller],
-            "$controller"  => [ucfirst($table)],
-        ];
-        return $data;
-    }
 
-    /*
-     * 控制器
-     * */
-    //公共控制器
-    public function basecontroller(){
-        if(input('mokuai')){
-            $mokuai = input('mokuai');
-        }else{
-            $mokuai = 'index';
-        }
-        $this->assign('mokuai',$mokuai);
-        return view();
-    }
-    //登录控制器
-    public function logincontroller(){
-        if(input('mokuai')){
-            $mokuai = input('mokuai');
-        }else{
-            $mokuai = 'index';
-        }
-        $this->assign('mokuai',$mokuai);
-        return view();
-    }
-    //空控制器
-    public function errorontroller(){
-        if(input('mokuai')){
-            $mokuai = input('mokuai');
-        }else{
-            $mokuai = 'index';
-        }
-        $this->assign('mokuai',$mokuai);
-        return view();
-    }
-    //控制器
-    public function controller1(){
-        $mokuai = $this->mokuai();
-        $this->assign('mokuai',$mokuai);
-        $tbs = $this->tables();
-        $this->assign('tables',$tbs);
-        $this->assign('type',input('id'));
-        return view();
-    }
-    //获取模型
-    public function controller_step2(){
-        $mokuai = input('mokuai');
-        if(empty($mokuai)){
-            return false;
-        }
-        $dir1 = dirname(dirname(dirname(__FILE__))).'\\'.$mokuai."\\model";
-        $files = array();
-        if(is_dir($dir1)){
-            $child_dirs = scandir($dir1);
-            foreach($child_dirs as $child_dir){
-                if(strstr($child_dir, '.php')){
-                    $files['model'][] = basename($child_dir,".php");
-                }
-            }
-        }
-        return json($files);
-    }
-    //生成控制器文件
-    public function controller2(){
-        $mokuai = input('mokuai');
-        $modelLayer = input('modelLayer');
-        $controller = input('controller');
-        $controller_name = input('controller_name');
-        $function_name = input('function_name');
-        $type = input('type');
-        $model = input('model');
 
-        $controller_name = empty($controller_name) ? 'index':$controller_name;
-        $function_name = empty($function_name) ? 'index':$function_name;
-        $model = empty($model) ? 'model':$model;
-        $controller = empty($controller) ? 'Model':$controller;
-        $mokuai = empty($mokuai) ? 'index':$mokuai;
 
-        $modelbuild = $this->cbuild($mokuai,'controller',$controller_name);
-        $txt = $this->controllerbuild($mokuai,$modelLayer,$controller,$controller_name,$function_name,$type,$model);
-        $build = new Build;
-        $build->run($modelbuild,$txt);
-        $this->success('控制器完成');
-    }
-    //控制器文件代码
-    public function controllerbuild($mokuai,$modelLayer,$controller,$controller_name,$function_name,$type,$model){
-        $txt = "<?php
-namespace app\\$mokuai\controller;
-use think\Controller;
-class ".ucfirst($controller_name)." extends $controller
-{
-    //list
-    public function ".$function_name."List()
-    {";
-        if($modelLayer == 'model'){
-            $txt .="
-        \$model = model('$model');";
-        }else{
-            $txt .="
-        \$model = model('$model','$modelLayer');";
-        }
-        if(empty($type)){
-            $txt .="
-        return view();
-    }";
-        }else{
-            $txt .="
-        return res('200');
-    }";
-        }
-        $txt .= "
-    //edit
-    public function ".$function_name."Edit()
-    {";
-        if($modelLayer == 'model'){
-            $txt .="
-        \$model = model('$model');";
-        }else{
-            $txt .="
-        \$model = model('$model','$modelLayer');";
-        }
-        if(empty($type)){
-            $txt .="
-        return view();
-    }";
-        }else {
-            $txt .= "
-        return res('200');
-    }";
-        }
-        $txt .= "
-    //add
-    public function ".$function_name."Add()
-    {";
-        if($modelLayer == 'model'){
-            $txt .="
-        \$model = model('$model');";
-        }else{
-            $txt .="
-        \$model = model('$model','$modelLayer');";
-        }
-        if(empty($type)){
-            $txt .="
-        return view();
-    }";
-        }else {
-            $txt .= "
-        return res('200');
-    }";
-        }
-        $txt .= "
-    //del
-    public function ".$function_name."Del()
-    {";
-        if($modelLayer == 'model'){
-            $txt .="
-        \$model = model('$model');";
-        }else{
-            $txt .="
-        \$model = model('$model','$modelLayer');";
-        }
-        if(empty($type)){
-            $txt .="
-        return view();
-    }
-}";
-        }else {
-            $txt .= "
-        return res('200');
-    }
-}";
-        }
-        return $txt;
-    }
-    //生成控制器代码
-    public function controller3(){
-        $data = input('param.');
-        if(!$data['model']){
-            $this->error('选择model');
-        }
-        $this->assign('function_name',$data['function_name']);
-        $this->assign('type',$data['type']);
-        $this->assign('modelLayer',$data['modelLayer']);
-        $this->assign('model',$data['model']);
-        return view();
-    }
     /*
      * 视图
      * */

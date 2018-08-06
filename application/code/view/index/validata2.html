@@ -20,7 +20,7 @@
 <form class="layui-form" action="{:url('validata3')}" style="width: 90%;">
     <input type="hidden" name="table" value="{$Think.get.table}">
     <input type="hidden" name="validata_name" value="{$validata_name}">
-    <input type="hidden" name="is_code">
+    <input type="hidden" name="is_code" id="is_code">
     <div class="layui-form-item">
         <label>验证器名：{$validata_name}</label><br />
         <label style="color: red;">字段名后面的复选框为场景验证，只验证已点击字段（如果未点击，默认场景验证为全部字段）</label>
@@ -90,12 +90,14 @@
     layui.use('form', function(){
         var form = layui.form;
         //监听提交
+        //生成代码
         form.on('submit(formDemo)', function(data){
-            data.field.is_code = 1;
+            $(data.form.is_code).val(1);
             return true;
         });
+        //生成文件
         form.on('submit(formDemo1)', function(data){
-            data.field.is_code = 2;
+            $(data.form.is_code).val(2);
             return true;
         });
     });

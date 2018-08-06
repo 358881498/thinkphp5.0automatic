@@ -1,14 +1,14 @@
 <?php
 
 namespace app\code\controller;
-
+use think\Controller;
 use think\Request;
 
-class Error
+class Error extends Controller
 {
-        public function index(Request $request)
-        {
-             return $request->controller().'不存在！';
-        }
-        
+    //空控制器
+    public function index(Request $request)
+    {
+        return $this->error($request->controller().'是空控制器！');//可跳转到404
+    }
 }

@@ -1,11 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: YCH
- * Date: 2018/7/23
- * Time: 14:00
- */
 namespace app\code\controller;
+use think\Controller;
 use Demo;
 class Api extends Base
 {
